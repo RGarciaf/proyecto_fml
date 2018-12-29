@@ -7,23 +7,58 @@ import numpy as np
 import letritas
 
 class Dataset():
+
+    class Letra():
+        def __init__(self, array_pixels, clase):
+            self.array_pixels = array_pixels
+            self.clase = clase
+
     def __init__(self, seed=None):
         self.datos_Bruto = []
         self.primera_Linea = []
         self.seed = seed
+        self.datos = np.array([], dtype='int')
     
     def recortar(self): #D
         pass
     
     def convertirPixeles(self, letra, umbral=150):
         
-        for elem in letra:
+        for i_elem, elem in enumerate(letra):
             if elem > umbral:
-                letra[elem] = 1
+                letra[i_elem] = 0
             else:
-                letra[elem] = 0
+                letra[i_elem] = 1
         return letra
-        
+
+    def procesarDatos(self, celdas):
+        # Obtiene el string con las clases desde parametros por defecto
+        string_clases = letritas.parametros_por_defecto()[3]
+
+        # Obtiene las clases asignadas a cada letra (matriz numpy con la imagen)
+        for i_celda_letra, celda_letra in enumerate(celdas):
+
+            letra = self.Letra(celda_letra, i_celda_letra % len(string_clases))
+            self.datos_Bruto.append(letra)
+
+        return
+
+    def procesarCuadraditos(self, tipo_atributo, tamano = 1):
+
+        # Comprueba el tipo de atributo
+        if tipo_atributo == "cuadraditos":
+            for letra in self.datos_Bruto:
+                self.datos = np.append(self.datos, self.cuadraditos(letra.array_pixels, letra.clase, tamano))
+
+        elif tipo_atributo == "filas":
+            for letra in self.datos_Bruto:
+                self.datos = np.append(self.datos, self.cuadraditosFilas(letra.array_pixels, letra.clase, tamano))
+
+        else:
+            for letra in self.datos_Bruto:
+                self.datos = np.append(self.datos, self.cuadraditosColumnas(letra.array_pixels, letra.clase, tamano))
+
+        return
 
     def cuadraditos(self, letra, clase, tamCuadrado = 1):
         
@@ -42,34 +77,40 @@ class Dataset():
             letra = np.append(letra, clase)
             
         else:
-            # TODO
-            media = np.array()
-            for i in range(len(letra), step = tamCuadrado):
-                media = np.append(media, np.mean(letra[tamCuadrado*i:tamCuadrado*(i+1), 
-                                                tamCuadrado*i:tamCuadrado*(i+1)]))
+            media = np.array([], dtype='int')
+            for i in range(0, len(letra), tamCuadrado):
+                if len(letra) - i < tamCuadrado:
+                    break
+
+                for j in range(0, letra.shape[1], tamCuadrado):
+                    if letra.shape[1] - j < tamCuadrado:
+                        break
+                    media = np.append(media, int(np.mean(letra[i:(i+tamCuadrado), j:(j+tamCuadrado)])))
+
             letra = self.convertirPixeles(media)
             letra = np.append(letra, clase)
         return letra
         
     def cuadraditosFilas(self, letra, clase, tamFila = 1):
-        media = np.array()
-        for i in range(len(letra), step = tamFila):
-            media = np.append(media, np.mean(letra[ : ,tamFila*i:tamFila*(i+1)]))
+        media= np.array([], dtype='int')
+        for i in range(0, len(letra), tamFila):
+            if len(letra) - i < tamFila:
+                break
+            media = np.append(media, int(np.mean(letra[i:(i+tamFila), :])))
         letra = self.convertirPixeles(media)
         letra = np.append(letra, clase)
         return letra
         
     def cuadraditosColumnas(self, letra, clase, tamCol = 1):
-        media = np.array()
-        for i in range(len(letra), step = tamCol):
-            media = np.append(media, np.mean(letra[ tamCol*i:tamCol*(i+1) , : ]))
+        media = np.array([], dtype='int')
+        for i in range(0, letra.shape[1], tamCol):
+            if len(letra) - i < tamCol:
+                break
+            media = np.append(media, int(np.mean(letra[:, i:(i+tamCol)])))
         letra = self.convertirPixeles(media)
         letra = np.append(letra, clase)
         return letra
-        
-    
-    def procesarCuadraditos(self):
-       pass
+
     
     
     def cuadraditosRandom(self): #D

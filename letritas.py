@@ -93,7 +93,7 @@ def extrae_celdas(nombres_imagenes, alto, ancho):
         imagen             = mpimg.imread(nombre_imagen, True)
         
         cortes_h, cortes_v = detectar_lineas(imagen)
-        
+
         celdas.extend([extrae_cuadradito(imagen, corte_h, corte_v, alto, ancho) \
                                                      for corte_h in cortes_h \
                                                      for corte_v in cortes_v])

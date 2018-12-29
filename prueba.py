@@ -1,6 +1,8 @@
 import matplotlib.image as mpimg
-from  Dataset import Dataset
+from Dataset import Dataset
 import letritas
+import numpy as np
+np.set_printoptions(threshold=np.nan)
 
 
 dataset = Dataset(seed=1)
@@ -18,7 +20,6 @@ imagenLetra = letritas.extrae_cuadradito(imagen, h[0], v[0], alto=200, ancho=150
 imagen_aux = dataset.todoBlancoNegro(imagenLetra)
 
 dataset.mostrarImagen(imagen_aux)
-
 
 
 # Se prueba a imprimir varias imagenes
