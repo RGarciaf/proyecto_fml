@@ -29,7 +29,7 @@ def minimos(valores, umbral=0.3):
 
     return cuts
 
-def detectar_lineas(imagen):
+def detectar_lineas(imagen, eliminar_primera_fila=True):
     """ Devuelve las parejas de posiciones en la imagen que 
         corresponden con los cortes que vamos a hacer. Cada 
         pareja indica el pixel inicio y final del corte. Entre 
@@ -47,7 +47,8 @@ def detectar_lineas(imagen):
     #Eliminamos la primera columna y las dos primeras filas
     cortes_v.pop(0)
     cortes_h.pop(0)
-    cortes_h.pop(0)
+    if eliminar_primera_fila: 
+        cortes_h.pop(0)
     
     return [(ini,fin) for ini,fin in zip(cortes_h[:-1],cortes_h[1:])], \
            [(ini,fin) for ini,fin in zip(cortes_v[:-1],cortes_v[1:])]
@@ -75,11 +76,11 @@ def extrae_cuadradito(imagen, corte_h, corte_v, alto, ancho):
     return imagen[h0:h1+1, v0:v1+1]
 
 def test():
-    imagen = mpimg.imread('out-0032.png', True)
+    imagen = mpimg.imread('imagenes/out-0032.png', True)
     h, v = detectar_lineas(imagen)
     plt.imshow(extrae_cuadradito(imagen,h[np.random.randint(2,13)],v[np.random.randint(2,11)],200,150),cmap='gray')
     
-test()
+#test()
 
 
 def extrae_celdas(nombres_imagenes, alto, ancho):
@@ -114,6 +115,15 @@ def mostrar_imagenes(imagenes):
     plt.figure( figsize = (n_filas,10) )
     for i, img in enumerate(imagenes):
         plt.subplot(n_filas,10,i+1)
+        plt.imshow(img, cmap='gray')
+
+
+def mostrar_imagenes2(imagenes, columnas):
+    """ Muestra en un grid las imágenes """
+    n_filas = 1+len(imagenes)//columnas
+    plt.figure( figsize = (columnas, n_filas) )
+    for i, img in enumerate(imagenes):
+        plt.subplot(n_filas,columnas,i+1)
         plt.imshow(img, cmap='gray')
     
 def parametros_por_defecto():
