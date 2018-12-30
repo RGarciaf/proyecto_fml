@@ -23,32 +23,31 @@ class Dataset():
         pass
     
     def convertirPixeles(self, letra, umbral=150):
-        
+        # Comprueba si los valores RGB de los pixeles sobrepasan un umbral
         for i_elem, elem in enumerate(letra):
             if elem > umbral:
                 letra[i_elem] = 0
             else:
-                letra[i_elem] = 1
+                letra[i_elem] = 1   # La info que importa (negro)
         return letra
 
     def procesarDatos(self, celdas):
         # Obtiene el string con las clases desde parametros por defecto
         string_clases = letritas.parametros_por_defecto()[3]
 
-        # Obtiene las clases asignadas a cada letra (matriz numpy con la imagen)
+        # Crea objetos Letra con su clase y su array de pixeles
         for i_celda_letra, celda_letra in enumerate(celdas):
-
             letra = self.Letra(celda_letra, i_celda_letra % len(string_clases))
             self.datos_Bruto.append(letra)
 
         return
 
-    def procesarCuadraditos(self, tipo_atributo, tamano = 1):
-
-        # Comprueba el tipo de atributo
+    def procesarCuadraditos(self, tipo_atributo="cuadraditos", tamano=1):
+        # Comprueba el tipo de atributo (en funcion del mismo creara un dataset
+        # de cuadraditos, filas o columnas)
         if tipo_atributo == "cuadraditos":
             for letra in self.datos_Bruto:
-                self.datos = np.append(self.datos, self.cuadraditos(letra.array_pixels, letra.clase, tamano))
+                self.datos = np.append((self.datos, self.cuadraditos(letra.array_pixels, letra.clase, tamano)))
 
         elif tipo_atributo == "filas":
             for letra in self.datos_Bruto:
@@ -60,24 +59,24 @@ class Dataset():
 
         return
 
-    def cuadraditos(self, letra, clase, tamCuadrado = 1):
-        
-        # Comprobar si los cuadraditos son bloques o pixeles
+    def cuadraditos(self, letra, clase, tamCuadrado=1):
+        # Comprueba si los cuadraditos son bloques o pixeles
         if tamCuadrado == 1:
             
-            # Aplana el array letra
+            # Aplana el array letra a 1D
             dimensiones = letra.shape[0] * letra.shape[1]
-            
             letra = np.reshape(letra, dimensiones)
             
-            # Codifica los pixeles de letra a 0s o 1s
+            # Codifica los pixeles de letra a 0s o 1s y annade la clase
             letra = self.convertirPixeles(letra)
-            
-            # Annade la clase
             letra = np.append(letra, clase)
             
         else:
+            # Crea un array 1D con los valores medios de cada bloque
             media = np.array([], dtype='int')
+
+            # Recorre los bloques en los que se divide la imagen y calcula el valor medio
+            # de cada uno. (Los "trozos" de imagen que no quepan en cuadrados se ignoran)
             for i in range(0, len(letra), tamCuadrado):
                 if len(letra) - i < tamCuadrado:
                     break
@@ -87,31 +86,45 @@ class Dataset():
                         break
                     media = np.append(media, int(np.mean(letra[i:(i+tamCuadrado), j:(j+tamCuadrado)])))
 
+            # Codifica los pixeles de media a 0s o 1s y annade la clase
             letra = self.convertirPixeles(media)
             letra = np.append(letra, clase)
+
         return letra
         
-    def cuadraditosFilas(self, letra, clase, tamFila = 1):
+    def cuadraditosFilas(self, letra, clase, tamFila=1):
+        # Crea un array 1D con los valores medios de cada fila
         media= np.array([], dtype='int')
+
+        # Recorre las filas en las que se divide la imagen y calcula el valor medio
+        # de cada una. (Los "trozos" de imagen que no quepan en filas se ignoran)
         for i in range(0, len(letra), tamFila):
             if len(letra) - i < tamFila:
                 break
             media = np.append(media, int(np.mean(letra[i:(i+tamFila), :])))
+
+        # Codifica los pixeles de media a 0s o 1s y annade la clase
         letra = self.convertirPixeles(media)
         letra = np.append(letra, clase)
+
         return letra
         
-    def cuadraditosColumnas(self, letra, clase, tamCol = 1):
+    def cuadraditosColumnas(self, letra, clase, tamCol=1):
+        # Crea un array 1D con los valores medios de cada columna
         media = np.array([], dtype='int')
+
+        # Recorre las columnas en las que se divide la imagen y calcula el valor medio
+        # de cada una. (Los "trozos" de imagen que no quepan en columnas se ignoran)
         for i in range(0, letra.shape[1], tamCol):
             if len(letra) - i < tamCol:
                 break
             media = np.append(media, int(np.mean(letra[:, i:(i+tamCol)])))
+
+        # Codifica los pixeles de media a 0s o 1s y annade la clase
         letra = self.convertirPixeles(media)
         letra = np.append(letra, clase)
-        return letra
 
-    
+        return letra
     
     def cuadraditosRandom(self): #D
         pass
