@@ -17,7 +17,7 @@ class Dataset():
         self.datos_Bruto = []
         self.primera_Linea = []
         self.seed = seed
-        self.datos = np.array([], dtype='int')
+        self.datos = None
     
     def recortar(self): #D
         pass
@@ -46,16 +46,66 @@ class Dataset():
         # Comprueba el tipo de atributo (en funcion del mismo creara un dataset
         # de cuadraditos, filas o columnas)
         if tipo_atributo == "cuadraditos":
-            for letra in self.datos_Bruto:
-                self.datos = np.append((self.datos, self.cuadraditos(letra.array_pixels, letra.clase, tamano)))
+
+            # Convierte el array 1D devuelto por cuadraditos (usando la primera letra) en una fila
+            # de un array 2D, de la que se extraen sus dimensiones
+            primera_letra = self.datos_Bruto[0]
+
+            primer_dato = self.cuadraditos(primera_letra.array_pixels, primera_letra.clase, tamano)
+            tam_fila_2d = primer_dato.shape[0]
+            primer_dato = primer_dato.reshape(1, tam_fila_2d)
+
+            # Crea el array 2D datos vacio con la dimension adecuada, y annade todas las letras a datos
+            self.datos = np.empty((0, tam_fila_2d), dtype=int)
+            self.datos = np.append(self.datos, primer_dato, axis=0) # Primera letra
+
+            for letra in self.datos_Bruto[1:]:  # Resto de letras
+                dato = self.cuadraditos(letra.array_pixels, letra.clase, tamano)
+                dato = dato.reshape(1, tam_fila_2d)
+
+                self.datos = np.append(self.datos, dato, axis=0)
+                #self.datos = np.append((self.datos, self.cuadraditos(letra.array_pixels, letra.clase, tamano)))
 
         elif tipo_atributo == "filas":
-            for letra in self.datos_Bruto:
-                self.datos = np.append(self.datos, self.cuadraditosFilas(letra.array_pixels, letra.clase, tamano))
+
+            # Convierte el array 1D devuelto por cuadraditosFilas (usando la primera letra) en una fila
+            # de un array 2D, de la que se extraen sus dimensiones
+            primera_letra = self.datos_Bruto[0]
+
+            primer_dato = self.cuadraditosFilas(primera_letra.array_pixels, primera_letra.clase, tamano)
+            tam_fila_2d = primer_dato.shape[0]
+            primer_dato = primer_dato.reshape(1, tam_fila_2d)
+
+            # Crea el array 2D datos vacio con la dimension adecuada, y annade todas las letras a datos
+            self.datos = np.empty((0, tam_fila_2d), dtype=int)
+            self.datos = np.append(self.datos, primer_dato, axis=0)  # Primera letra
+
+            for letra in self.datos_Bruto[1:]:  # Resto de letras
+                dato = self.cuadraditosFilas(letra.array_pixels, letra.clase, tamano)
+                dato = dato.reshape(1, tam_fila_2d)
+
+                self.datos = np.append(self.datos, dato, axis=0)
+                # self.datos = np.append(self.datos, self.cuadraditosFilas(letra.array_pixels, letra.clase, tamano))
 
         else:
-            for letra in self.datos_Bruto:
-                self.datos = np.append(self.datos, self.cuadraditosColumnas(letra.array_pixels, letra.clase, tamano))
+            # Convierte el array 1D devuelto por cuadraditosColumnas (usando la primera letra) en una fila
+            # de un array 2D, de la que se extraen sus dimensiones
+            primera_letra = self.datos_Bruto[0]
+
+            primer_dato = self.cuadraditosColumnas(primera_letra.array_pixels, primera_letra.clase, tamano)
+            tam_fila_2d = primer_dato.shape[0]
+            primer_dato = primer_dato.reshape(1, tam_fila_2d)
+
+            # Crea el array 2D datos vacio con la dimension adecuada, y annade todas las letras a datos
+            self.datos = np.empty((0, tam_fila_2d), dtype=int)
+            self.datos = np.append(self.datos, primer_dato, axis=0)  # Primera letra
+
+            for letra in self.datos_Bruto[1:]:  # Resto de letras
+                dato = self.cuadraditosColumnas(letra.array_pixels, letra.clase, tamano)
+                dato = dato.reshape(1, tam_fila_2d)
+
+                self.datos = np.append(self.datos, dato, axis=0)
+                #self.datos = np.append(self.datos, self.cuadraditosColumnas(letra.array_pixels, letra.clase, tamano))
 
         return
 
