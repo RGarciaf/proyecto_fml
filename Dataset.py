@@ -17,10 +17,18 @@ class Dataset():
         self.datos_Bruto = []
         self.primera_Linea = []
         self.seed = seed
+        self.permutacion = None
         self.datos = None
     
-    def recortar(self): #D
-        pass
+    def recortar(self, imagen): #D
+        '''
+        Dada una imagen, se devuelve una imagen mas pequenya, ya recortada.
+        Los cortes que se realizan son paralelos a los ejes.
+        '''
+
+
+
+        pass #return imagen[x_ini:x_fin, y_ini:y_fin]
     
     def convertirPixeles(self, letra, umbral=150):
         # Comprueba si los valores RGB de los pixeles sobrepasan un umbral
@@ -176,8 +184,76 @@ class Dataset():
 
         return letra
     
-    def cuadraditosRandom(self): #D
-        pass
+    def cuadraditosRandom(self, imagen, l_cuadraditros, porcentajeAgrupacion=0.3,
+                          votacion="por_tamanyo", random=True):
+        '''
+        Dada una imagen y unas coordenadas que definen los cuadraditos en los que
+        se ha dividido la imagen (las coordenadas estan en la lista l_cuadraditos).
+        Se agrupan los cuadraditos segun "porcentajeAgrupacion" (100% significaria que
+        todos los cuadraditos serian un atributo; por otra parte 0% significaria que cada
+        cuadradito seria un atributo). En funcion de cual sea el color mayoritario en las
+        agrupaciones que se realizaran de forma random, ese sera el valor del atributo
+        del atributo en el diccionario a crear y devolver.
+        Como hay cuadraditos mas grandes que otros se pueden configurar la votacion
+        para que tengan mayor peso aquellos cuadraditos con mayor tamanyo
+        '''
+        
+        # Se obtiene el numero de atributos
+        num_cuadraditos = len(l_cuadraditros)
+        
+        # Si es la primera letra a transformar en datos todavia no hay
+        # una permutacion de los indices de los cuadraditos a utilizar
+        if self.permutacion is None:
+            if random:
+                self.permutacion = np.random.permutation(np.arange(num_cuadraditos))
+            else:
+                self.permutacion = np.arange(num_cuadraditos)#np.random.permutation(np.arange(num_cuadraditos))
+
+        elif len(self.permutacion) != num_cuadraditos:
+            print ("Algo ha ido mal el tamanyo de la permutacion no coincide con el numero de cuadraditos")
+            return None
+
+        # Se ajusta el "porcentajeAgrupacion" para evitar la division por cero
+        # y para no repetir agrupaciones. Si porcentajeAgrupacion = 0.1
+        # y num_cuadraditos = 6, habra 4 grupos de atributos repetidos
+        if porcentajeAgrupacion <= 0 or num_cuadraditos < 1/porcentajeAgrupacion:
+            porcentajeAgrupacion = 1/num_cuadraditos
+
+        atributos = []        
+        i_atributo = 0
+        i_inferior = 0
+        i_superior = porcentajeAgrupacion
+        while i_superior <= 1:
+            
+            # Se obtiene la sublista de cuadraditos que conformaran un atributo
+            l_cuadraditros_atributo = []
+            for i in self.permutacion[round(num_cuadraditos*i_inferior):round(num_cuadraditos*i_superior)]:
+                l_cuadraditros_atributo.append(l_cuadraditros[i])
+
+            # Por cada cuadradito "c", se incrementa el contador de votos del color en ese
+            # cuadradito. Si se eligio la votacion por tamanyo cada cuadradito tiene tantos
+            # votos como numero de pixeles en el cuadradito
+            votacion_colores = {255: 0, 0: 0}
+            for c in l_cuadraditros_atributo:
+                color_mayoritario, n_votos_blanco, n_votos_negro = self.colorMayoritario(imagen,c[0][0],c[0][1],c[1][0],c[1][1])
+                if votacion == "por_tamanyo":
+                    votacion_colores[255] += n_votos_blanco
+                    votacion_colores[0] += n_votos_negro
+                else:
+                    votacion_colores[color_mayoritario] += 1
+
+            if votacion_colores[255] >= votacion_colores[0]:
+                atributos.append(0)
+            else:
+                atributos.append(1)
+
+            
+            i_atributo += 1
+            i_inferior = i_superior
+            i_superior += porcentajeAgrupacion
+            i_superior = 1 if (i_superior < 1 and i_superior+porcentajeAgrupacion > 1) else i_superior
+        
+        return atributos
     
     def cuadraditosDiagonales(self):
         pass
@@ -207,39 +283,67 @@ class Dataset():
     def negros(self):
         pass
 
-    def crearCuadraditos(self, x_ini, x_fin, y_ini, y_fin, n_pixeles_ancho=None, n_pixeles_alto=None):
-        
-        if n_pixeles_ancho is None:
-            n_pixeles_ancho = x_fin - x_ini
-        if n_pixeles_alto is None:
-            n_pixeles_alto = y_fin - y_ini
+    def colorMayoritario(self, imagen, x_ini, x_fin, y_ini, y_fin):
+        '''
+        Dada una imagen y unas coordenadas de inicio y fin de la imagen se
+        obtiene cual es el color mayoritario en el area de las coordenas
+        y se devuelve dicho color junto con el resultado d ela votacion
+        '''
 
-        print (x_ini, x_fin, y_ini, y_fin, n_pixeles_ancho, n_pixeles_alto)
+        # Se obtiene la zona de la imagen que esta dentro de las coordenas
+        zona_coordenadas = imagen[x_ini:x_fin,y_ini:y_fin]
+
+        # Se cambia la forma del array para que este en 1D y asi poder contar cual es el elemento mayoritario
+        zona_coordenadas = np.reshape(zona_coordenadas, zona_coordenadas.size)
         
+        # Se realiza el conteo de elementos
+        conteo = np.bincount(zona_coordenadas)
+        
+        # Si no hay pixeles blancos la longitud del conteo sera < 2, 
+        # asi que se devuelve que hay 0 pixeles blancos
+        if conteo.size < 2:
+            return np.argmax(conteo), 0, conteo[0]
+        else:
+            return np.argmax(conteo), conteo[255], conteo[0]
+
+    def crearCuadraditos(self, x_ini, x_fin, y_ini, y_fin, n_pixeles_ancho=None, n_pixeles_alto=None):
+        '''
+        Dada una imagen y unas coordenadas de inicio y fin de la imagen se
+        crean divisiones, recortes, en la imagen que definiran las coordenadas
+        de inicio y fin de cada cuadradito
+        '''
+        
+        # None significa que se toma como tamanyo
+        # el ancho (para n_pixeles_ancho) o el alto (para n_pixeles_alto)
+        if n_pixeles_alto is None:
+            n_pixeles_alto = x_fin - x_ini
+        if n_pixeles_ancho is None:
+            n_pixeles_ancho = y_fin - y_ini
+        
+        assert n_pixeles_alto <= x_fin - x_ini and n_pixeles_alto >= 0, "Tamanyo de alto incorrecto"
+        assert n_pixeles_ancho <= y_fin - y_ini and n_pixeles_ancho >= 0, "Tamanyo de ancho incorrecto"
+
         l_cuadraditros = []
 
-        for coordenada_x in range(x_ini, x_fin, n_pixeles_ancho):
-            for coordenada_y in range(y_ini, y_fin, n_pixeles_alto):
+        # Se crean los limites de los cuadraditos
+        for coordenada_x in range(x_ini, x_fin, n_pixeles_alto):
+            for coordenada_y in range(y_ini, y_fin, n_pixeles_ancho):
 
                 # Se obtiene las coordenadas x de inicio y fin del recorte del cuadradito
-                if coordenada_x + n_pixeles_ancho > x_fin:
+                if coordenada_x + n_pixeles_alto > x_fin:
                     l_coordenadas = [(coordenada_x, x_fin)]
                 else:
-                    l_coordenadas = [(coordenada_x, coordenada_x + n_pixeles_ancho)]
+                    l_coordenadas = [(coordenada_x, coordenada_x + n_pixeles_alto - 1)]
 
                 # Se obtiene las coordenadas y de inicio y fin del recorte del cuadradito
-                if coordenada_y + n_pixeles_alto > y_fin:
+                if coordenada_y + n_pixeles_ancho > y_fin:
                     l_coordenadas.append((coordenada_y, y_fin))
                 else:    
-                    l_coordenadas.append((coordenada_y, coordenada_y + n_pixeles_alto))
+                    l_coordenadas.append((coordenada_y, coordenada_y + n_pixeles_ancho - 1))
 
                 l_cuadraditros.append(l_coordenadas)
 
         return l_cuadraditros
-        
-                    
-
-
 
     def quitaMargenes(self, corte_h, corte_v):
         '''
@@ -266,20 +370,74 @@ class Dataset():
 
         return h0, h1+1, v0, v1+1
 
-    def mostrarImagen(self, imagen=None):
-        plt.imshow(imagen, cmap='gray')
+    def mostrarImagen(self, imagen):
+        '''
+        Dada una imagen se muestra por pantalla
+        '''
+        plt.imshow(imagen, interpolation=None, cmap='gray')
         plt.show()
 
-    def mostrarImagenes(self, imagenes=None, columnas=10):
+        return
+
+    def mostrarImagenes(self, imagenes, columnas=10):
+        '''
+        Dado un grupo de imagenes se muestran por pantalla
+        en forma de rejilla con numero de columnas "columnas"
+        y el numero de filas que sean necesarias
+        '''
         letritas.mostrar_imagenes2(imagenes, columnas)
         plt.show()
 
+        return
 
     def todoBlancoNegro(self, imagen, umbral=165):
+        '''
+        Dada una imagen cambia todos los colores de la imagen
+        por blancos y negros. El valor umbral donde da el color
+        blanco viene dado por el parametro "umbral"
+        '''
+        
+        # Se crea una imagen en negro (todo ceros) donde se iran cambiando por blancos algunos pixeles
         imagen_aux = np.zeros(shape = (imagen.shape[0], imagen.shape[1]), dtype=np.int64)
-        for i_valor, valores_fila in enumerate(imagen):
+        
+        # Por cada pixel se comprueba que valor tiene
+        for i_valor, valores_fila in enumerate(imagen):           
            for j_valor, valor in enumerate(valores_fila):
+              
+              # Si el valor del pixel es mayor a umbral decimos que es blanco
               if valor > umbral:
                  imagen_aux[i_valor][j_valor] += 255
 
         return imagen_aux
+
+    def crearDataset(self, l_atributos, l_clases, ruta="ConjuntosDatos/", nombre="prueba.data"):
+
+        with open(ruta+nombre, 'w') as fichero:
+
+            # Se escribe el numero de datos que hay
+            fichero.write(str(len(l_atributos))+"\n")
+
+            # Se escribe el nombre de los atributos que hay
+            atributos_nombre = ""
+            num_atributos = len(l_atributos[0])
+            for i in range(num_atributos):
+                atributos_nombre += "x" + str(i) + ","
+            atributos_nombre += "class"
+            fichero.write(atributos_nombre+"\n")
+
+            # Se escribe el nombre de los atributos que hay
+            tipo_atributos = ""
+            for i in range(num_atributos):
+                tipo_atributos += "Continuo,"
+            tipo_atributos += "Nominal"
+            fichero.write(tipo_atributos+"\n")
+
+            # Se escriben los valores de cada dato y su clase
+            for i_dato, atributos in enumerate(l_atributos):
+                dato = ""
+                for valor in atributos:
+                    dato += str(valor) + ","
+                dato += str(l_clases[i_dato])
+                fichero.write(dato+"\n")
+
+        fichero.close()
