@@ -72,8 +72,8 @@ dataset.mostrarImagenes(imagenes, columnas=num_columnas)
 # de letras de la carpeta out y se mostrara el funcionamientos de la funcion mostrarImagenes
 ####################################################################################################################
 
-n_pixeles_ancho = 100
-n_pixeles_alto = 100
+n_pixeles_ancho = 25
+n_pixeles_alto = 25
 
 dataset = Dataset(seed=1)
 
@@ -120,7 +120,7 @@ while i_2 < tam_aux:
 # Comienzo de la seccion 4 del Main de prueba, en esta seccion se utilizaran la imagenes
 # de letras de la carpeta out y se creara el conjunto de datos correspondiente a random
 ####################################################################################################################
-'''
+
 n_pixeles_ancho = 15 # No se recomienda utilizar numeros inferiores a 6 porque se distorsiona todo
 n_pixeles_alto = 15 # No se recomienda utilizar numeros inferiores a 6 porque se distorsiona todo
 
@@ -140,10 +140,8 @@ for nombre_imagen in lista_imagenes[:10]:
 	imagenBN = dataset.todoBlancoNegro(imagen)
 
 	l_cuadraditros = dataset.crearCuadraditos(0, imagenBN.shape[0], 0, imagenBN.shape[1], n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
-	l_atributos.append(dataset.cuadraditosRandom(imagenBN, l_cuadraditros, porcentajeAgrupacion=0.001, random=True))
+	l_atributos.append(dataset.cuadraditosRandom(imagenBN, l_cuadraditros, porcentajeAgrupacion=0.001, solo_blanco_negro=True, random=False))
 	l_clases.append(nombre_imagen[-1])
 
 dataset.crearDataset(l_atributos, l_clases, ruta="ConjuntosDatos/", nombre="letritasRandom.data")
-'''
-
 
