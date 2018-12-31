@@ -65,7 +65,7 @@ class Dataset():
 
             # Crea el array 2D datos vacio con la dimension adecuada, y annade todas las letras a datos
             self.datos = np.empty((0, tam_fila_2d), dtype=int)
-            self.datos = np.append(self.datos, primer_dato, axis=0) # Primera letra
+            self.datos = np.append(self.datos, primer_dato, axis=0)  # Primera letra
 
             for letra in self.datos_Bruto[1:]:  # Resto de letras
                 dato = self.cuadraditos(letra.array_pixels, letra.clase, tamano)
@@ -185,7 +185,7 @@ class Dataset():
         return letra
     
     def cuadraditosRandom(self, imagen, l_cuadraditros, porcentajeAgrupacion=0.3,
-                          votacion="por_tamanyo", random=True):
+                          votacion="por_tamanyo", solo_blanco_negro=False, random=True):
         '''
         Dada una imagen y unas coordenadas que definen los cuadraditos en los que
         se ha dividido la imagen (las coordenadas estan en la lista l_cuadraditos).
@@ -230,22 +230,11 @@ class Dataset():
             for i in self.permutacion[round(num_cuadraditos*i_inferior):round(num_cuadraditos*i_superior)]:
                 l_cuadraditros_atributo.append(l_cuadraditros[i])
 
-            # Por cada cuadradito "c", se incrementa el contador de votos del color en ese
-            # cuadradito. Si se eligio la votacion por tamanyo cada cuadradito tiene tantos
-            # votos como numero de pixeles en el cuadradito
-            votacion_colores = {255: 0, 0: 0}
-            for c in l_cuadraditros_atributo:
-                color_mayoritario, n_votos_blanco, n_votos_negro = self.colorMayoritario(imagen,c[0][0],c[0][1],c[1][0],c[1][1])
-                if votacion == "por_tamanyo":
-                    votacion_colores[255] += n_votos_blanco
-                    votacion_colores[0] += n_votos_negro
-                else:
-                    votacion_colores[color_mayoritario] += 1
-
-            if votacion_colores[255] >= votacion_colores[0]:
-                atributos.append(0)
+            if solo_blanco_negro:
+                atributos.append(self.votarBlancoNegro(imagen, l_cuadraditros_atributo, votacion))
             else:
-                atributos.append(1)
+                for c in l_cuadraditros_atributo:
+                    atributos.append(self.mediaColores(imagen,c[0][0],c[0][1],c[1][0],c[1][1]))
 
             
             i_atributo += 1
@@ -282,6 +271,41 @@ class Dataset():
     
     def negros(self):
         pass
+    def votarBlancoNegro(self, imagen, l_cuadraditros_atributo, votacion):
+        '''
+        Se vota si hay mas blancos, 
+        '''
+
+        # Por cada cuadradito "c", se incrementa el contador de votos del color en ese
+        # cuadradito. Si se eligio la votacion por tamanyo cada cuadradito tiene tantos
+        # votos como numero de pixeles en el cuadradito
+        votacion_colores = {255: 0, 0: 0}
+        for c in l_cuadraditros_atributo:
+            color_mayoritario, n_votos_blanco, n_votos_negro = self.colorMayoritario(imagen,c[0][0],c[0][1],c[1][0],c[1][1])
+            if votacion == "por_tamanyo":
+                votacion_colores[255] += n_votos_blanco
+                votacion_colores[0] += n_votos_negro
+            else:
+                votacion_colores[color_mayoritario] += 1
+
+        if votacion_colores[255] >= votacion_colores[0]:
+            return 0
+
+        return 1
+
+    def mediaColores(self, imagen, x_ini, x_fin, y_ini, y_fin):
+        '''
+        Dada una imagen y unas coordenadas de inicio y fin
+        de la imagen se obtiene cual es el color medio
+        '''
+
+        # Se obtiene la zona de la imagen que esta dentro de las coordenas
+        zona_coordenadas = imagen[x_ini:x_fin,y_ini:y_fin]
+
+        # Se cambia la forma del array para que este en 1D y asi poder contar cual es el elemento mayoritario
+        zona_coordenadas = np.reshape(zona_coordenadas, zona_coordenadas.size)
+        
+        return np.mean(zona_coordenadas)
 
     def colorMayoritario(self, imagen, x_ini, x_fin, y_ini, y_fin):
         '''

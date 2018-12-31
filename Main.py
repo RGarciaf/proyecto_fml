@@ -91,7 +91,6 @@ for cuadradito in l_cuadraditros:
 
 dataset.mostrarImagenes(imagenes, columnas=math.ceil(imagenBN.shape[1]/n_pixeles_ancho))
 
-
 ####################################################################################################################
 # Comienzo de la seccion 3 del Main de prueba, en esta seccion se utilizaran la imagenes
 # de letras de la carpeta out y se mostrara el funcionamientos de la funcion random
@@ -106,7 +105,7 @@ imagen = mpimg.imread('out/l00000_A.png', True)
 imagenBN = dataset.todoBlancoNegro(imagen)
 
 l_cuadraditros = dataset.crearCuadraditos(0, imagenBN.shape[0], 0, imagenBN.shape[1], n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
-aux = dataset.cuadraditosRandom(imagenBN, l_cuadraditros, porcentajeAgrupacion=0.001, random=False)
+aux = dataset.cuadraditosRandom(imagenBN, l_cuadraditros, porcentajeAgrupacion=0.001, solo_blanco_negro=True, random=False)
 
 i_1 = 0
 i_2 = imagenBN.shape[1]/n_pixeles_ancho
@@ -121,7 +120,7 @@ while i_2 < tam_aux:
 # Comienzo de la seccion 4 del Main de prueba, en esta seccion se utilizaran la imagenes
 # de letras de la carpeta out y se creara el conjunto de datos correspondiente a random
 ####################################################################################################################
-
+'''
 n_pixeles_ancho = 15 # No se recomienda utilizar numeros inferiores a 6 porque se distorsiona todo
 n_pixeles_alto = 15 # No se recomienda utilizar numeros inferiores a 6 porque se distorsiona todo
 
@@ -145,6 +144,6 @@ for nombre_imagen in lista_imagenes[:10]:
 	l_clases.append(nombre_imagen[-1])
 
 dataset.crearDataset(l_atributos, l_clases, ruta="ConjuntosDatos/", nombre="letritasRandom.data")
-
+'''
 
 
