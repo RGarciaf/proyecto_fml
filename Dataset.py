@@ -13,27 +13,103 @@ class Dataset():
             self.array_pixels = array_pixels
             self.clase = clase
 
-    def __init__(self, seed=None):
+    def __init__(self, umbral=165, seed=None):
         self.datos_Bruto = []
         self.primera_Linea = []
+        self.umbral = umbral
         self.seed = seed
         self.permutacion = None
         self.datos = None
     
-    def recortar(self, imagen): #D
+    def recortar(self, imagen, porcentaje_umbral_recorte=[0.05, 0.05, 0.05, 0.05]): #D
         '''
-        Dada una imagen, se devuelve una imagen mas pequenya, ya recortada.
-        Los cortes que se realizan son paralelos a los ejes.
+        Dada una imagen, se devuelve una imagen mas pequenya, ya recortada. Los cortes que
+        se realizan son paralelos a los ejes y se realizan una vez que el porcentaje de
+        pixeles negros encontrados en la columna o fila supera el "porcentajeUmbralRecorte"
         '''
 
+        assert isinstance(porcentaje_umbral_recorte, (list, float)), 'Tipo de dato ' + str(type(porcentaje_umbral_recorte)) + '"porcentaje_umbral_recorte" incorrecto'
 
+        ancho = imagen.shape[1]
+        alto = imagen.shape[0]
 
-        pass #return imagen[x_ini:x_fin, y_ini:y_fin]
+        if isinstance(porcentaje_umbral_recorte, float):
+            min_pixeles_arriba = alto * porcentaje_umbral_recorte
+            min_pixeles_abajo = alto * porcentaje_umbral_recorte
+            min_pixeles_izquierda = ancho * porcentaje_umbral_recorte
+            min_pixeles_derecha = ancho * porcentaje_umbral_recorte
+        else:
+            min_pixeles_arriba = alto * porcentaje_umbral_recorte[0]
+            min_pixeles_abajo = alto * porcentaje_umbral_recorte[1]
+            min_pixeles_izquierda = ancho * porcentaje_umbral_recorte[2]
+            min_pixeles_derecha = ancho * porcentaje_umbral_recorte[3]
+
+        assert min_pixeles_arriba <= alto and min_pixeles_arriba >= 0, 'Valor de "min_pixeles_arriba" ' + str(min_pixeles_arriba) + ' incorrecto'
+        assert min_pixeles_abajo <= alto and min_pixeles_abajo >= 0, 'Valor de "min_pixeles_abajo" ' + str(min_pixeles_abajo) + ' incorrecto'
+        assert min_pixeles_izquierda <= ancho and min_pixeles_izquierda >= 0, 'Valor de "min_pixeles_izquierda" ' + str(min_pixeles_izquierda) + ' incorrecto'
+        assert min_pixeles_derecha <= ancho and min_pixeles_derecha >= 0, 'Valor de "min_pixeles_derecha" ' + str(min_pixeles_derecha) + ' incorrecto'
+
+        y_ini = 0
+        y_fin = alto
+        x_ini = 0
+        x_fin = ancho
+        
+        print (0,alto,0,ancho)
+        print (min_pixeles_arriba,min_pixeles_abajo,min_pixeles_izquierda,min_pixeles_derecha)
+
+        y_ini = self.obtenerLimite(imagen, min_pixeles_arriba, reverse=False)
+        y_fin = self.obtenerLimite(imagen, min_pixeles_abajo, max_tamanyo=alto,reverse=True) + 1
+
+        imagen_traspuesta = np.transpose(imagen)
+
+        x_ini = self.obtenerLimite(imagen_traspuesta, min_pixeles_izquierda, reverse=False)
+        x_fin = self.obtenerLimite(imagen_traspuesta, min_pixeles_derecha, max_tamanyo=ancho,reverse=True) + 1
+
+        print (y_ini,y_fin, x_ini,x_fin)
+
+        return imagen[y_ini:y_fin, x_ini:x_fin]
     
-    def convertirPixeles(self, letra, umbral=150):
+    def obtenerLimite(self, imagen, min_pixeles, max_tamanyo=0, reverse=False):
+        '''
+        Dada una imagen, se corta por un lado a partir de que se supera "min_pixeles"
+        si no se supera nunca se devuelve el mayor valor encontrado
+        '''
+        
+        l_valores = np.zeros(shape=imagen.size)
+
+        if reverse:
+            # Se recorta la imagen a partir de que se supera min_pixeles
+            for i_fila, _ in enumerate(imagen[0]):
+
+                # Se obtiene el numero de pixeles que son negros en la imagen
+                l_pixeles_negros = np.bincount(imagen[max_tamanyo - i_fila - 1 ])[:self.umbral]
+                n_pixeles_negros = np.sum(l_pixeles_negros)
+
+                # Si hay tantos o mas pixeles negros como el minimo numero
+                # de pixeles se recorta (y_fin sera el numero de fila actual)
+                l_valores[i_fila] += n_pixeles_negros
+                if n_pixeles_negros >= min_pixeles:
+                    return max_tamanyo - i_fila - 1
+        else:
+            # Se recorta la imagen a partir de que se supera min_pixeles
+            for i_fila, fila in enumerate(imagen):
+
+                # Se obtiene el numero de pixeles que son negros en la imagen
+                l_pixeles_negros = np.bincount(fila)[:self.umbral]
+                n_pixeles_negros = np.sum(l_pixeles_negros)
+
+                # Si hay tantos o mas pixeles negros como el minimo numero
+                # de pixeles se recorta (y_fin sera el numero de fila actual)
+                l_valores[i_fila] += n_pixeles_negros
+                if n_pixeles_negros >= min_pixeles:
+                    return  i_fila
+
+        return int(np.amax(l_valores))
+
+    def convertirPixeles(self, letra):
         # Comprueba si los valores RGB de los pixeles sobrepasan un umbral
         for i_elem, elem in enumerate(letra):
-            if elem > umbral:
+            if elem > self.umbral:
                 letra[i_elem] = 0
             else:
                 letra[i_elem] = 1   # La info que importa (negro)
@@ -184,7 +260,7 @@ class Dataset():
 
         return letra
     
-    def cuadraditosRandom(self, imagen, l_cuadraditros, porcentajeAgrupacion=0.3,
+    def cuadraditosRandom(self, imagen, l_cuadraditros, porcentajeAgrupacion=0.0,
                           votacion="por_tamanyo", solo_blanco_negro=False, random=True):
         '''
         Dada una imagen y unas coordenadas que definen los cuadraditos en los que
@@ -271,6 +347,7 @@ class Dataset():
     
     def negros(self):
         pass
+
     def votarBlancoNegro(self, imagen, l_cuadraditros_atributo, votacion):
         '''
         Se vota si hay mas blancos, 
@@ -300,7 +377,7 @@ class Dataset():
         '''
 
         # Se obtiene la zona de la imagen que esta dentro de las coordenas
-        zona_coordenadas = imagen[x_ini:x_fin,y_ini:y_fin]
+        zona_coordenadas = imagen[y_ini:y_fin, x_ini:x_fin]
 
         # Se cambia la forma del array para que este en 1D y asi poder contar cual es el elemento mayoritario
         zona_coordenadas = np.reshape(zona_coordenadas, zona_coordenadas.size)
@@ -315,14 +392,14 @@ class Dataset():
         '''
 
         # Se obtiene la zona de la imagen que esta dentro de las coordenas
-        zona_coordenadas = imagen[x_ini:x_fin,y_ini:y_fin]
+        zona_coordenadas = imagen[y_ini:y_fin, x_ini:x_fin]
 
         # Se cambia la forma del array para que este en 1D y asi poder contar cual es el elemento mayoritario
         zona_coordenadas = np.reshape(zona_coordenadas, zona_coordenadas.size)
         
         # Se realiza el conteo de elementos
         conteo = np.bincount(zona_coordenadas)
-        
+
         # Si no hay pixeles blancos la longitud del conteo sera < 2, 
         # asi que se devuelve que hay 0 pixeles blancos
         if conteo.size < 2:
@@ -339,33 +416,34 @@ class Dataset():
         
         # None significa que se toma como tamanyo
         # el ancho (para n_pixeles_ancho) o el alto (para n_pixeles_alto)
-        if n_pixeles_alto is None:
-            n_pixeles_alto = x_fin - x_ini
         if n_pixeles_ancho is None:
-            n_pixeles_ancho = y_fin - y_ini
+            n_pixeles_ancho = x_fin - x_ini
+        if n_pixeles_alto is None:
+            n_pixeles_alto = y_fin - y_ini
         
-        assert n_pixeles_alto <= x_fin - x_ini and n_pixeles_alto >= 0, "Tamanyo de alto incorrecto"
-        assert n_pixeles_ancho <= y_fin - y_ini and n_pixeles_ancho >= 0, "Tamanyo de ancho incorrecto"
+        assert n_pixeles_ancho <= x_fin - x_ini and n_pixeles_alto >= 0, "Tamanyo de ancho incorrecto"
+        assert n_pixeles_alto <= y_fin - y_ini and n_pixeles_ancho >= 0, "Tamanyo de alto incorrecto"
 
         l_cuadraditros = []
 
         # Se crean los limites de los cuadraditos
-        for coordenada_x in range(x_ini, x_fin, n_pixeles_alto):
-            for coordenada_y in range(y_ini, y_fin, n_pixeles_ancho):
+        for coordenada_y in range(y_ini, y_fin, n_pixeles_alto):
+            for coordenada_x in range(x_ini, x_fin, n_pixeles_ancho):
 
                 # Se obtiene las coordenadas x de inicio y fin del recorte del cuadradito
-                if coordenada_x + n_pixeles_alto > x_fin:
+                if coordenada_x + n_pixeles_ancho > x_fin:
                     l_coordenadas = [(coordenada_x, x_fin)]
                 else:
-                    l_coordenadas = [(coordenada_x, coordenada_x + n_pixeles_alto - 1)]
+                    l_coordenadas = [(coordenada_x, coordenada_x + n_pixeles_ancho - 1)]
 
                 # Se obtiene las coordenadas y de inicio y fin del recorte del cuadradito
-                if coordenada_y + n_pixeles_ancho > y_fin:
+                if coordenada_y + n_pixeles_alto > y_fin:
                     l_coordenadas.append((coordenada_y, y_fin))
-                else:    
-                    l_coordenadas.append((coordenada_y, coordenada_y + n_pixeles_ancho - 1))
+                else:
+                    l_coordenadas.append((coordenada_y, coordenada_y + n_pixeles_alto - 1))
 
                 l_cuadraditros.append(l_coordenadas)
+
 
         return l_cuadraditros
 
@@ -414,11 +492,11 @@ class Dataset():
 
         return
 
-    def todoBlancoNegro(self, imagen, umbral=165):
+    def todoBlancoNegro(self, imagen):
         '''
         Dada una imagen cambia todos los colores de la imagen
         por blancos y negros. El valor umbral donde da el color
-        blanco viene dado por el parametro "umbral"
+        blanco viene dado por el valor "self.umbral"
         '''
         
         # Se crea una imagen en negro (todo ceros) donde se iran cambiando por blancos algunos pixeles
@@ -428,8 +506,8 @@ class Dataset():
         for i_valor, valores_fila in enumerate(imagen):           
            for j_valor, valor in enumerate(valores_fila):
               
-              # Si el valor del pixel es mayor a umbral decimos que es blanco
-              if valor > umbral:
+              # Si el valor del pixel es mayor a self.umbral decimos que es blanco
+              if valor > self.umbral:
                  imagen_aux[i_valor][j_valor] += 255
 
         return imagen_aux
