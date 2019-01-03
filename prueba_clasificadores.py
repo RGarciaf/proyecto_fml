@@ -9,11 +9,12 @@ import numpy as np
 np.set_printoptions(threshold=np.nan)
 
 
+seed=1
 
 # Generar el dataset y la estrategia de particionado
 celdas = letritas.run(letritas.parametros_por_defecto)
 
-dataset = Dataset(seed=1)
+dataset = Dataset(seed=seed)
 dataset.procesarDatos(celdas)
 dataset.procesarCuadraditos("cuadraditos", 10)
 
@@ -24,7 +25,6 @@ celdas = []
 for nombre_imagen in nombres_imagenes:
     celdas.append(mpimg.imread(nombre_imagen, True))
 
-seed=1
 
 tipo_atributo="random"
 n_pixeles_ancho=10
@@ -72,11 +72,11 @@ print("Media: " + str(statistics.mean(aciertos_particion)))
 print()
 
 
-'''
+
 # Prueba clasificador KNN
 clasificadorSL_KNN = ClasificadorSL.ClasificadorKNN_SL("distance", 3)
 
-errores_particion = clasificadorSL_KNN.validacion(val_cruzada, dataset, clasificadorSL_KNN)
+errores_particion = clasificadorSL_KNN.validacion(val_cruzada, dataset, clasificadorSL_KNN, seed=seed)
 aciertos_particion = [(1 - elem) for elem in errores_particion]
 
 print("KNN")
@@ -90,7 +90,7 @@ print()
 # Prueba clasificador Regresion Logistica
 clasificadorSL_RegLog = ClasificadorSL.ClasificadorRegLog_SL(num_epocas=10)
 
-errores_particion = clasificadorSL_RegLog.validacion(val_cruzada, dataset, clasificadorSL_RegLog)
+errores_particion = clasificadorSL_RegLog.validacion(val_cruzada, dataset, clasificadorSL_RegLog, seed=seed)
 aciertos_particion = [(1 - elem) for elem in errores_particion]
 
 print("Regresion Logistica")
@@ -105,7 +105,7 @@ print()
 # Prueba clasificador Arbol de Decision
 clasificadorSL_ArbolDecision = ClasificadorSL.ClasificadorArbolDecision_SL()
 
-errores_particion = clasificadorSL_ArbolDecision.validacion(val_cruzada, dataset, clasificadorSL_ArbolDecision)
+errores_particion = clasificadorSL_ArbolDecision.validacion(val_cruzada, dataset, clasificadorSL_ArbolDecision, seed=seed)
 aciertos_particion = [(1 - elem) for elem in errores_particion]
 
 print("Arbol de Decision")
@@ -120,7 +120,7 @@ print()
 # Prueba clasificador Random Forest
 clasificadorSL_RandomForest = ClasificadorSL.ClasificadorRandomForest_SL()
 
-errores_particion = clasificadorSL_RandomForest.validacion(val_cruzada, dataset, clasificadorSL_RandomForest)
+errores_particion = clasificadorSL_RandomForest.validacion(val_cruzada, dataset, clasificadorSL_RandomForest, seed=seed)
 aciertos_particion = [(1 - elem) for elem in errores_particion]
 
 print("Random Forest")
@@ -129,4 +129,4 @@ print("Random Forest")
 
 print("Aciertos particion: " + str(aciertos_particion))
 print("Media: " + str(statistics.mean(aciertos_particion)))
-'''
+
