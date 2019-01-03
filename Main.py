@@ -58,8 +58,8 @@ recortes_imagen = dataset.crearCuadraditos(x_ini=x_ini, x_fin=x_fin, y_ini=y_ini
 imagenes = []
 
 for recorte in recortes_imagen:
-	imagen_recorte = imagen[recorte[0][0]:recorte[0][1], recorte[1][0]:recorte[1][1]]
-	imagenes.append(dataset.todoBlancoNegro(imagen_recorte))
+    imagen_recorte = imagen[recorte[0][0]:recorte[0][1], recorte[1][0]:recorte[1][1]]
+    imagenes.append(dataset.todoBlancoNegro(imagen_recorte))
 
 num_columnas = len(imagenes)
 
@@ -86,8 +86,8 @@ dataset.cuadraditosRandom(imagenBN, l_cuadraditros, porcentajeAgrupacion=0.1, so
 
 imagenes = []
 for cuadradito in l_cuadraditros:
-	imagen_recorte = imagenBN[cuadradito[1][0]:cuadradito[1][1], cuadradito[0][0]:cuadradito[0][1]]
-	imagenes.append(imagen_recorte)
+    imagen_recorte = imagenBN[cuadradito[1][0]:cuadradito[1][1], cuadradito[0][0]:cuadradito[0][1]]
+    imagenes.append(imagen_recorte)
 
 dataset.mostrarImagenes(imagenes, columnas=math.ceil(imagenBN.shape[1]/n_pixeles_ancho))
 '''
@@ -105,15 +105,15 @@ imagen = mpimg.imread('out/l00000_A.png', True)
 imagenBN = dataset.todoBlancoNegro(imagen)
 
 l_cuadraditros = dataset.crearCuadraditos(0, imagenBN.shape[1], 0, imagenBN.shape[0], n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
-aux = dataset.cuadraditosRandom(imagenBN, l_cuadraditros, porcentajeAgrupacion=0.001, solo_blanco_negro=True, random=False)
+cuadraditos_random = dataset.cuadraditosRandom(imagenBN, l_cuadraditros, porcentajeAgrupacion=0.001, solo_blanco_negro=True, random=False)
 
 i_1 = 0
 i_2 = imagenBN.shape[1]/n_pixeles_ancho
-tam_aux = len(aux)
-while i_2 < tam_aux:
-	print (aux[round(i_1):round(i_2)])
-	i_1 = i_2
-	i_2 += imagenBN.shape[1]/n_pixeles_ancho
+tam_cuadraditos_random = len(cuadraditos_random)
+while i_2 < tam_cuadraditos_random:
+    print (cuadraditos_random[round(i_1):round(i_2)])
+    i_1 = i_2
+    i_2 += imagenBN.shape[1]/n_pixeles_ancho
 
 '''
 ####################################################################################################################
@@ -130,18 +130,18 @@ letras = "ABCDEFGHIJ"
 
 lista_imagenes = []
 for i in range(0, 1320):
-	numero = str(100000 + i)
-	lista_imagenes.append("l"+ numero[1:] + "_" + letras[i%10])
+    numero = str(100000 + i)
+    lista_imagenes.append("l"+ numero[1:] + "_" + letras[i%10])
 
 l_atributos = []
 l_clases = []
 for nombre_imagen in lista_imagenes[:10]:
-	imagen = mpimg.imread('out/' + nombre_imagen + '.png', True)
-	imagenBN = dataset.todoBlancoNegro(imagen)
+    imagen = mpimg.imread('out/' + nombre_imagen + '.png', True)
+    imagenBN = dataset.todoBlancoNegro(imagen)
 
-	l_cuadraditros = dataset.crearCuadraditos(0, imagenBN.shape[1], 0, imagenBN.shape[0], n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
-	l_atributos.append(dataset.cuadraditosRandom(imagenBN, l_cuadraditros, porcentajeAgrupacion=0.001, solo_blanco_negro=True, random=False))
-	l_clases.append(nombre_imagen[-1])
+    l_cuadraditros = dataset.crearCuadraditos(0, imagenBN.shape[1], 0, imagenBN.shape[0], n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
+    l_atributos.append(dataset.cuadraditosRandom(imagenBN, l_cuadraditros, porcentajeAgrupacion=0.001, solo_blanco_negro=True, random=False))
+    l_clases.append(nombre_imagen[-1])
 
 dataset.crearDataset(l_atributos, l_clases, ruta="ConjuntosDatos/", nombre="letritasRandom.data")
 '''
@@ -151,7 +151,7 @@ dataset.crearDataset(l_atributos, l_clases, ruta="ConjuntosDatos/", nombre="letr
 # Comienzo de la seccion 5 del Main de prueba, en esta seccion se utilizaran la imagenes
 # de letras de la carpeta out y se probara la funcion recortar
 ####################################################################################################################
-
+'''
 dataset = Dataset(seed=1)
 
 imagen = mpimg.imread('out/l00000_A.png', True)
@@ -159,3 +159,24 @@ imagen_recortada = dataset.recortar(imagen, porcentaje_umbral_recorte=.1)
 dataset.mostrarImagen(imagen_recortada)
 imagen_recortada = dataset.recortar(imagen, porcentaje_umbral_recorte=[0.05, 0.1, 0.08, 0.08])
 dataset.mostrarImagen(imagen_recortada)
+'''
+
+n_pixeles_ancho = 6 # No se recomienda utilizar numeros inferiores a 6 porque se distorsiona todo
+n_pixeles_alto = 6 # No se recomienda utilizar numeros inferiores a 6 porque se distorsiona todo
+
+dataset = Dataset(seed=1)
+
+imagen = mpimg.imread('out/l00000_A.png', True)
+
+l_cuadraditros = dataset.crearCuadraditos(0, imagen.shape[1], 0, imagen.shape[0], n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
+cuadraditos_random = dataset.cuadraditosRandom(imagen, l_cuadraditros, porcentajeAgrupacion=0, solo_blanco_negro=False, random=False)
+
+#print (cuadraditos_random)
+
+i_1 = 0
+i_2 = imagen.shape[1]/n_pixeles_ancho
+tam_cuadraditos_random = len(cuadraditos_random)
+while i_2 < tam_cuadraditos_random:
+    print (cuadraditos_random[round(i_1):round(i_2)])
+    i_1 = i_2
+    i_2 += imagen.shape[1]/n_pixeles_ancho

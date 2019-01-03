@@ -21,7 +21,7 @@ class Dataset():
         self.permutacion = None
         self.datos = None
     
-    def recortar(self, imagen, porcentaje_umbral_recorte=[0.05, 0.05, 0.05, 0.05]): #D
+    def recortar(self, imagen, porcentaje_umbral_recorte=[0.05, 0.05, 0.05, 0.05]):
         '''
         Dada una imagen, se devuelve una imagen mas pequenya, ya recortada. Los cortes que
         se realizan son paralelos a los ejes y se realizan una vez que el porcentaje de
@@ -53,19 +53,16 @@ class Dataset():
         y_fin = alto
         x_ini = 0
         x_fin = ancho
-        
-        print (0,alto,0,ancho)
-        print (min_pixeles_arriba,min_pixeles_abajo,min_pixeles_izquierda,min_pixeles_derecha)
+
 
         y_ini = self.obtenerLimite(imagen, min_pixeles_arriba, reverse=False)
-        y_fin = self.obtenerLimite(imagen, min_pixeles_abajo, max_tamanyo=alto,reverse=True) + 1
+        y_fin = self.obtenerLimite(imagen, min_pixeles_abajo, max_tamanyo=alto,reverse=True)
 
         imagen_traspuesta = np.transpose(imagen)
 
         x_ini = self.obtenerLimite(imagen_traspuesta, min_pixeles_izquierda, reverse=False)
-        x_fin = self.obtenerLimite(imagen_traspuesta, min_pixeles_derecha, max_tamanyo=ancho,reverse=True) + 1
+        x_fin = self.obtenerLimite(imagen_traspuesta, min_pixeles_derecha, max_tamanyo=ancho,reverse=True)
 
-        print (y_ini,y_fin, x_ini,x_fin)
 
         return imagen[y_ini:y_fin, x_ini:x_fin]
     
@@ -126,7 +123,9 @@ class Dataset():
 
         return
 
-    def procesarCuadraditos(self, tipo_atributo="cuadraditos", tamano=1):
+    def procesarCuadraditos(self, tipo_atributo="cuadraditos", tamano=1,
+                            n_pixeles_ancho=10, n_pixeles_alto=10,
+                            porcentajeAgrupacion=0.01, solo_blanco_negro=False, random=True):
         # Comprueba el tipo de atributo (en funcion del mismo creara un dataset
         # de cuadraditos, filas o columnas)
         if tipo_atributo == "cuadraditos":
@@ -150,6 +149,7 @@ class Dataset():
                 self.datos = np.append(self.datos, dato, axis=0)
                 #self.datos = np.append((self.datos, self.cuadraditos(letra.array_pixels, letra.clase, tamano)))
 
+
         elif tipo_atributo == "filas":
 
             # Convierte el array 1D devuelto por cuadraditosFilas (usando la primera letra) en una fila
@@ -171,7 +171,7 @@ class Dataset():
                 self.datos = np.append(self.datos, dato, axis=0)
                 # self.datos = np.append(self.datos, self.cuadraditosFilas(letra.array_pixels, letra.clase, tamano))
 
-        else:
+        elif tipo_atributo == "columnas":
             # Convierte el array 1D devuelto por cuadraditosColumnas (usando la primera letra) en una fila
             # de un array 2D, de la que se extraen sus dimensiones
             primera_letra = self.datos_Bruto[0]
@@ -190,6 +190,27 @@ class Dataset():
 
                 self.datos = np.append(self.datos, dato, axis=0)
                 #self.datos = np.append(self.datos, self.cuadraditosColumnas(letra.array_pixels, letra.clase, tamano))
+
+        elif tipo_atributo == "random":
+            primera_letra = self.datos_Bruto[0]
+            if solo_blanco_negro:
+                primera_letra.array_pixels = self.todoBlancoNegro(primera_letra.array_pixels)
+            l_cuadraditros = self.crearCuadraditos(0, primera_letra.array_pixels.shape[1], 0, primera_letra.array_pixels.shape[0],
+                                                      n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
+            self.datos = np.array([self.cuadraditosRandom(primera_letra.array_pixels, primera_letra.clase, l_cuadraditros,
+                                             porcentajeAgrupacion=porcentajeAgrupacion, solo_blanco_negro=solo_blanco_negro, random=random)])
+
+            for letra in self.datos_Bruto:  # Resto de letras
+                if solo_blanco_negro:
+                    letra.array_pixels = self.todoBlancoNegro(letra.array_pixels)
+
+                l_cuadraditros = self.crearCuadraditos(0, letra.array_pixels.shape[1], 0, letra.array_pixels.shape[0],
+                                                          n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
+                dato = self.cuadraditosRandom(letra.array_pixels, letra.clase, l_cuadraditros,
+                                                 porcentajeAgrupacion=porcentajeAgrupacion, solo_blanco_negro=solo_blanco_negro, random=random)
+                self.datos = np.concatenate((self.datos, np.array([dato])))
+        else:
+            raise ValueError('Tipo de "tipo_atributo" ' + str(tipo_atributo) +' incorrecto.')
 
         return
 
@@ -260,7 +281,7 @@ class Dataset():
 
         return letra
     
-    def cuadraditosRandom(self, imagen, l_cuadraditros, porcentajeAgrupacion=0.0,
+    def cuadraditosRandom(self, imagen_letra, clase, l_cuadraditros, porcentajeAgrupacion=0.0,
                           votacion="por_tamanyo", solo_blanco_negro=False, random=True):
         '''
         Dada una imagen y unas coordenadas que definen los cuadraditos en los que
@@ -307,10 +328,9 @@ class Dataset():
                 l_cuadraditros_atributo.append(l_cuadraditros[i])
 
             if solo_blanco_negro:
-                atributos.append(self.votarBlancoNegro(imagen, l_cuadraditros_atributo, votacion))
+                atributos.append(self.votarBlancoNegro(imagen_letra, l_cuadraditros_atributo, votacion))
             else:
-                for c in l_cuadraditros_atributo:
-                    atributos.append(self.mediaColores(imagen,c[0][0],c[0][1],c[1][0],c[1][1]))
+                atributos.append(self.mediaColores(imagen_letra, l_cuadraditros_atributo))
 
             
             i_atributo += 1
@@ -318,7 +338,7 @@ class Dataset():
             i_superior += porcentajeAgrupacion
             i_superior = 1 if (i_superior < 1 and i_superior+porcentajeAgrupacion > 1) else i_superior
         
-        return atributos
+        return np.append(atributos, np.array(clase))
     
     def cuadraditosDiagonales(self):
         pass
@@ -370,19 +390,22 @@ class Dataset():
 
         return 1
 
-    def mediaColores(self, imagen, x_ini, x_fin, y_ini, y_fin):
+    def mediaColores(self, imagen, l_cuadraditros_atributo):
         '''
-        Dada una imagen y unas coordenadas de inicio y fin
-        de la imagen se obtiene cual es el color medio
+        Dada una imagen y una lista de coordenadas de inicio y fin de cuadraditos
+        dentro de la imagen se devuelve la media de color de esos cuadraditos
         '''
 
-        # Se obtiene la zona de la imagen que esta dentro de las coordenas
-        zona_coordenadas = imagen[y_ini:y_fin, x_ini:x_fin]
+        zonas_coordenadas = np.array([], dtype=np.int)
 
-        # Se cambia la forma del array para que este en 1D y asi poder contar cual es el elemento mayoritario
-        zona_coordenadas = np.reshape(zona_coordenadas, zona_coordenadas.size)
-        
-        return np.mean(zona_coordenadas)
+        for c in l_cuadraditros_atributo:
+            # Se obtiene la zona de la imagen que esta dentro de las coordenas
+            zona_coordenadas = imagen[c[1][0]:c[1][1], c[0][0]:c[0][1]]
+
+            # Se cambia la forma del array para que este en 1D y asi poder contar cual es el elemento mayoritario
+            zonas_coordenadas = np.append(zonas_coordenadas, np.reshape(zona_coordenadas, zona_coordenadas.size))
+
+        return np.mean(zonas_coordenadas)
 
     def colorMayoritario(self, imagen, x_ini, x_fin, y_ini, y_fin):
         '''
@@ -434,13 +457,13 @@ class Dataset():
                 if coordenada_x + n_pixeles_ancho > x_fin:
                     l_coordenadas = [(coordenada_x, x_fin)]
                 else:
-                    l_coordenadas = [(coordenada_x, coordenada_x + n_pixeles_ancho - 1)]
+                    l_coordenadas = [(coordenada_x, coordenada_x + n_pixeles_ancho)]
 
                 # Se obtiene las coordenadas y de inicio y fin del recorte del cuadradito
                 if coordenada_y + n_pixeles_alto > y_fin:
                     l_coordenadas.append((coordenada_y, y_fin))
                 else:
-                    l_coordenadas.append((coordenada_y, coordenada_y + n_pixeles_alto - 1))
+                    l_coordenadas.append((coordenada_y, coordenada_y + n_pixeles_alto))
 
                 l_cuadraditros.append(l_coordenadas)
 
@@ -512,7 +535,7 @@ class Dataset():
 
         return imagen_aux
 
-    def crearDataset(self, l_atributos, l_clases, ruta="ConjuntosDatos/", nombre="prueba.data"):
+    def crearDataset(self, l_atributos, l_clases=None, ruta="ConjuntosDatos/", nombre="prueba.data"):
 
         with open(ruta+nombre, 'w') as fichero:
 
@@ -522,16 +545,28 @@ class Dataset():
             # Se escribe el nombre de los atributos que hay
             atributos_nombre = ""
             num_atributos = len(l_atributos[0])
-            for i in range(num_atributos):
-                atributos_nombre += "x" + str(i) + ","
-            atributos_nombre += "class"
+            # Si l_clases es None la clase ya estaba en l_atributos
+            if l_clases is not None:
+                for i in range(num_atributos):
+                    atributos_nombre += "x" + str(i) + ","
+                atributos_nombre += "class"
+            else:
+                for i in range(num_atributos-1):
+                    atributos_nombre += "x" + str(i) + ","
+                atributos_nombre += "class"
             fichero.write(atributos_nombre+"\n")
 
             # Se escribe el nombre de los atributos que hay
             tipo_atributos = ""
-            for i in range(num_atributos):
-                tipo_atributos += "Continuo,"
-            tipo_atributos += "Nominal"
+            # Si l_clases es None la clase ya estaba en l_atributos
+            if l_clases is not None:
+                for i in range(num_atributos):
+                    tipo_atributos += "Continuo,"
+                tipo_atributos += "Nominal"
+            else:
+                for i in range(num_atributos-1):
+                    tipo_atributos += "Continuo,"
+                tipo_atributos += "Nominal"
             fichero.write(tipo_atributos+"\n")
 
             # Se escriben los valores de cada dato y su clase
@@ -539,7 +574,13 @@ class Dataset():
                 dato = ""
                 for valor in atributos:
                     dato += str(valor) + ","
-                dato += str(l_clases[i_dato])
+
+                # Si l_clases es None la clase ya estaba en
+                # l_atributos asi que se quita la ultima coma
+                if l_clases is not None:
+                    dato += str(l_clases[i_dato])
+                else:
+                    dato = dato[:-1]
                 fichero.write(dato+"\n")
 
         fichero.close()

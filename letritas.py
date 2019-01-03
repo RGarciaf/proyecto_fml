@@ -133,7 +133,7 @@ def parametros_por_defecto():
     """
     import glob
     
-    nombres_imagenes = glob.glob('*png')
+    nombres_imagenes = glob.glob('imagenes/*png')
     alto             = 206
     ancho            = 150
     clases           = 'ABCDEFGHIJ'
