@@ -87,7 +87,7 @@ def extrae_celdas(nombres_imagenes, alto, ancho):
     """ A partir de una lista de imágenes extrae las celdas
         todas con un mismo alto y ancho
     """
-    
+
     celdas = []
     for nombre_imagen in nombres_imagenes:
         imagen             = mpimg.imread(nombre_imagen, True)
@@ -126,18 +126,18 @@ def mostrar_imagenes2(imagenes, columnas):
         plt.subplot(n_filas,columnas,i+1)
         plt.imshow(img, cmap='gray',vmin=0,vmax=1)
     
-def parametros_por_defecto():
+def parametros_por_defecto(ruta='imagenes/'):
     """ Devuelve los parámetros por defecto.
         Se pueden crear nuevas funciones con otros
         parametros
     """
     import glob
     
-    nombres_imagenes = glob.glob('imagenes/*png')
+    nombres_imagenes = glob.glob(str(ruta) + '*png')
     alto             = 206
     ancho            = 150
     clases           = 'ABCDEFGHIJ'
-    
+
     return nombres_imagenes, alto, ancho, clases
  
 def run(get_params=parametros_por_defecto):
@@ -153,5 +153,5 @@ def run(get_params=parametros_por_defecto):
     celdas = extrae_celdas(nombres_imagenes, alto, ancho)
     
     guarda_celdas(celdas, clases, 'out')
-        
+    
     return np.array(celdas)

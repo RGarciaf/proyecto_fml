@@ -1,3 +1,5 @@
+import matplotlib.image as mpimg    
+
 from Dataset import Dataset
 import EstrategiaParticionadoSL
 import ClasificadorSL
@@ -6,32 +8,47 @@ import statistics
 import numpy as np
 np.set_printoptions(threshold=np.nan)
 
+
+
 # Generar el dataset y la estrategia de particionado
 celdas = letritas.run(letritas.parametros_por_defecto)
-
 
 dataset = Dataset(seed=1)
 dataset.procesarDatos(celdas)
 dataset.procesarCuadraditos("cuadraditos", 10)
 
+
 '''
-tipo_procesado="cuadraditos"
-n_pixeles_ancho=5
-n_pixeles_alto=5
-porcentajeAgrupacion=0.008
+nombres_imagenes = sorted(letritas.parametros_por_defecto("out/")[0])
+celdas = []
+for nombre_imagen in nombres_imagenes:
+    celdas.append(mpimg.imread(nombre_imagen, True))
+
+seed=1
+
+tipo_atributo="random"
+n_pixeles_ancho=10
+n_pixeles_alto=n_pixeles_ancho
+porcentajeAgrupacion=0.0
 solo_blanco_negro=True
-random=True
-print ("tipo_procesado\t\t", tipo_procesado)
+random=False
+hacer_recorte=False
+print ("tipo_atributo\t\t", tipo_atributo)
 print ("n_pixeles_ancho\t\t", n_pixeles_ancho)
 print ("n_pixeles_alto\t\t", n_pixeles_alto)
 print ("porcentajeAgrupacion\t", porcentajeAgrupacion)
 print ("solo_blanco_negro\t", solo_blanco_negro)
-print ("random\t\t\t", random + "\n\n")
+print ("random\t\t\t", str(random))
+print ("hacer_recorte\t\t", str(hacer_recorte) + "\n\n")
 
-dataset.procesarCuadraditos(tipo_procesado, tamano=10,
+dataset = Dataset(seed=seed)
+dataset.procesarDatos(celdas)
+dataset.procesarCuadraditos(tipo_atributo, tamano=10,
                             n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto,
-                            porcentajeAgrupacion=porcentajeAgrupacion, solo_blanco_negro=solo_blanco_negro, random=random)
+                            porcentajeAgrupacion=porcentajeAgrupacion, solo_blanco_negro=solo_blanco_negro,
+                            random=random, hacer_recorte=hacer_recorte)
 '''
+
 
 val_cruzada = EstrategiaParticionadoSL.ValidacionCruzadaSL(numeroParticiones=5)
 
@@ -40,7 +57,7 @@ val_cruzada = EstrategiaParticionadoSL.ValidacionCruzadaSL(numeroParticiones=5)
 clasificadorSL_NB = ClasificadorSL.ClasificadorNB_SL()
 
 
-errores_particion = clasificadorSL_NB.validacion(val_cruzada, dataset, clasificadorSL_NB)
+errores_particion = clasificadorSL_NB.validacion(val_cruzada, dataset, clasificadorSL_NB, seed=seed)
 aciertos_particion = [(1 - elem) for elem in errores_particion]
 
 if clasificadorSL_NB.Multinomial_flag == True:
@@ -55,6 +72,7 @@ print("Media: " + str(statistics.mean(aciertos_particion)))
 print()
 
 
+'''
 # Prueba clasificador KNN
 clasificadorSL_KNN = ClasificadorSL.ClasificadorKNN_SL("distance", 3)
 
@@ -111,8 +129,4 @@ print("Random Forest")
 
 print("Aciertos particion: " + str(aciertos_particion))
 print("Media: " + str(statistics.mean(aciertos_particion)))
-
-
-
-
-
+'''

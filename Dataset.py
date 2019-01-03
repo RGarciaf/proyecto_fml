@@ -17,9 +17,13 @@ class Dataset():
         self.datos_Bruto = []
         self.primera_Linea = []
         self.umbral = umbral
-        self.seed = seed
         self.permutacion = None
+        self.tam_img = None
         self.datos = None
+        
+        self.seed = seed
+        #random.seed(self.seed)
+        np.random.seed(self.seed)
     
     def recortar(self, imagen, porcentaje_umbral_recorte=[0.05, 0.05, 0.05, 0.05]):
         '''
@@ -63,9 +67,13 @@ class Dataset():
         x_ini = self.obtenerLimite(imagen_traspuesta, min_pixeles_izquierda, reverse=False)
         x_fin = self.obtenerLimite(imagen_traspuesta, min_pixeles_derecha, max_tamanyo=ancho,reverse=True)
 
+        if self.tam_img is None:
+            self.tam_img = [x_fin - x_ini, y_fin - y_ini]
+            return imagen[y_ini:y_fin, x_ini:x_fin]
+        else:
+            imagen_recortada = imagen[y_ini:y_fin, x_ini:x_fin]
+            return self.redimensionarImagen(imagen_recortada, x_fin - x_ini, y_fin - y_ini)
 
-        return imagen[y_ini:y_fin, x_ini:x_fin]
-    
     def obtenerLimite(self, imagen, min_pixeles, max_tamanyo=0, reverse=False):
         '''
         Dada una imagen, se corta por un lado a partir de que se supera "min_pixeles"
@@ -103,6 +111,23 @@ class Dataset():
 
         return int(np.amax(l_valores))
 
+    def redimensionarImagen(self, imagen, tam_h_actual, tam_v_actual):
+
+        tam_h_actual -= 1
+        tam_v_actual -= 1
+
+        tam_v_final = self.tam_img[1]
+        tam_h_final = self.tam_img[0]
+
+        imagen_redimensionada = []
+        for i in range(tam_v_final):
+            imagen_redimensionada.append([])
+            for j in range(tam_h_final):
+                imagen_redimensionada[i].append(imagen[(round(i/tam_v_final*tam_v_actual))][(round(j/tam_h_final*tam_h_actual))])
+
+        
+        return np.array(imagen_redimensionada, dtype=np.int)
+
     def convertirPixeles(self, letra):
         # Comprueba si los valores RGB de los pixeles sobrepasan un umbral
         for i_elem, elem in enumerate(letra):
@@ -125,7 +150,7 @@ class Dataset():
 
     def procesarCuadraditos(self, tipo_atributo="cuadraditos", tamano=1,
                             n_pixeles_ancho=10, n_pixeles_alto=10,
-                            porcentajeAgrupacion=0.01, solo_blanco_negro=False, random=True):
+                            porcentajeAgrupacion=0.01, solo_blanco_negro=False, random=True, hacer_recorte=True):
         # Comprueba el tipo de atributo (en funcion del mismo creara un dataset
         # de cuadraditos, filas o columnas)
         if tipo_atributo == "cuadraditos":
@@ -133,7 +158,8 @@ class Dataset():
             # Convierte el array 1D devuelto por cuadraditos (usando la primera letra) en una fila
             # de un array 2D, de la que se extraen sus dimensiones
             primera_letra = self.datos_Bruto[0]
-
+            if hacer_recorte:
+                primera_letra.array_pixels = self.recortar(primera_letra.array_pixels)
             primer_dato = self.cuadraditos(primera_letra.array_pixels, primera_letra.clase, tamano)
             tam_fila_2d = primer_dato.shape[0]
             primer_dato = primer_dato.reshape(1, tam_fila_2d)
@@ -143,6 +169,9 @@ class Dataset():
             self.datos = np.append(self.datos, primer_dato, axis=0)  # Primera letra
 
             for letra in self.datos_Bruto[1:]:  # Resto de letras
+                if hacer_recorte:
+                    letra.array_pixels = self.recortar(letra.array_pixels)
+
                 dato = self.cuadraditos(letra.array_pixels, letra.clase, tamano)
                 dato = dato.reshape(1, tam_fila_2d)
 
@@ -155,7 +184,8 @@ class Dataset():
             # Convierte el array 1D devuelto por cuadraditosFilas (usando la primera letra) en una fila
             # de un array 2D, de la que se extraen sus dimensiones
             primera_letra = self.datos_Bruto[0]
-
+            if hacer_recorte:
+                primera_letra.array_pixels = self.recortar(primera_letra.array_pixels)
             primer_dato = self.cuadraditosFilas(primera_letra.array_pixels, primera_letra.clase, tamano)
             tam_fila_2d = primer_dato.shape[0]
             primer_dato = primer_dato.reshape(1, tam_fila_2d)
@@ -165,6 +195,9 @@ class Dataset():
             self.datos = np.append(self.datos, primer_dato, axis=0)  # Primera letra
 
             for letra in self.datos_Bruto[1:]:  # Resto de letras
+                if hacer_recorte:
+                    letra.array_pixels = self.recortar(letra.array_pixels)
+
                 dato = self.cuadraditosFilas(letra.array_pixels, letra.clase, tamano)
                 dato = dato.reshape(1, tam_fila_2d)
 
@@ -175,7 +208,8 @@ class Dataset():
             # Convierte el array 1D devuelto por cuadraditosColumnas (usando la primera letra) en una fila
             # de un array 2D, de la que se extraen sus dimensiones
             primera_letra = self.datos_Bruto[0]
-
+            if hacer_recorte:
+                primera_letra.array_pixels = self.recortar(primera_letra.array_pixels)
             primer_dato = self.cuadraditosColumnas(primera_letra.array_pixels, primera_letra.clase, tamano)
             tam_fila_2d = primer_dato.shape[0]
             primer_dato = primer_dato.reshape(1, tam_fila_2d)
@@ -185,6 +219,9 @@ class Dataset():
             self.datos = np.append(self.datos, primer_dato, axis=0)  # Primera letra
 
             for letra in self.datos_Bruto[1:]:  # Resto de letras
+                if hacer_recorte:
+                    letra.array_pixels = self.recortar(letra.array_pixels)
+
                 dato = self.cuadraditosColumnas(letra.array_pixels, letra.clase, tamano)
                 dato = dato.reshape(1, tam_fila_2d)
 
@@ -192,15 +229,24 @@ class Dataset():
                 #self.datos = np.append(self.datos, self.cuadraditosColumnas(letra.array_pixels, letra.clase, tamano))
 
         elif tipo_atributo == "random":
+            
             primera_letra = self.datos_Bruto[0]
+
+            if hacer_recorte:
+                primera_letra.array_pixels = self.recortar(primera_letra.array_pixels)
             if solo_blanco_negro:
                 primera_letra.array_pixels = self.todoBlancoNegro(primera_letra.array_pixels)
+
             l_cuadraditros = self.crearCuadraditos(0, primera_letra.array_pixels.shape[1], 0, primera_letra.array_pixels.shape[0],
                                                       n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
             self.datos = np.array([self.cuadraditosRandom(primera_letra.array_pixels, primera_letra.clase, l_cuadraditros,
                                              porcentajeAgrupacion=porcentajeAgrupacion, solo_blanco_negro=solo_blanco_negro, random=random)])
+            
 
             for letra in self.datos_Bruto:  # Resto de letras
+                if hacer_recorte:
+                    letra.array_pixels = self.recortar(letra.array_pixels)
+
                 if solo_blanco_negro:
                     letra.array_pixels = self.todoBlancoNegro(letra.array_pixels)
 
@@ -294,7 +340,7 @@ class Dataset():
         Como hay cuadraditos mas grandes que otros se pueden configurar la votacion
         para que tengan mayor peso aquellos cuadraditos con mayor tamanyo
         '''
-        
+
         # Se obtiene el numero de atributos
         num_cuadraditos = len(l_cuadraditros)
         
