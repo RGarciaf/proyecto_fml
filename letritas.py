@@ -124,7 +124,7 @@ def mostrar_imagenes2(imagenes, columnas):
     plt.figure( figsize = (columnas, n_filas) )
     for i, img in enumerate(imagenes):
         plt.subplot(n_filas,columnas,i+1)
-        plt.imshow(img, cmap='gray',vmin=0,vmax=1)
+        plt.imshow(img, cmap='gray',vmin=0,vmax=255)
     
 def parametros_por_defecto(ruta='imagenes/'):
     """ Devuelve los parámetros por defecto.

@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 import copy
+import math
 
-import numpy as np
 import letritas
 
 class Dataset():
@@ -25,7 +25,7 @@ class Dataset():
         #random.seed(self.seed)
         np.random.seed(self.seed)
     
-    def recortar(self, imagen, porcentaje_umbral_recorte=[0.05, 0.05, 0.05, 0.05]):
+    def recortar(self, imagen, porcentaje_umbral_recorte=0.05, redimensionar=True):
         '''
         Dada una imagen, se devuelve una imagen mas pequenya, ya recortada. Los cortes que
         se realizan son paralelos a los ejes y se realizan una vez que el porcentaje de
@@ -59,35 +59,35 @@ class Dataset():
         x_fin = ancho
 
 
-        y_ini = self.obtenerLimite(imagen, min_pixeles_arriba, reverse=False)
-        y_fin = self.obtenerLimite(imagen, min_pixeles_abajo, max_tamanyo=alto,reverse=True)
+        y_ini = self.obtenerBordeLetra(imagen, min_pixeles_arriba, reverse=False)
+        y_fin = self.obtenerBordeLetra(imagen, min_pixeles_abajo, max_tamanyo=alto,reverse=True)
 
         imagen_traspuesta = np.transpose(imagen)
 
-        x_ini = self.obtenerLimite(imagen_traspuesta, min_pixeles_izquierda, reverse=False)
-        x_fin = self.obtenerLimite(imagen_traspuesta, min_pixeles_derecha, max_tamanyo=ancho,reverse=True)
+        x_ini = self.obtenerBordeLetra(imagen_traspuesta, min_pixeles_izquierda, reverse=False)
+        x_fin = self.obtenerBordeLetra(imagen_traspuesta, min_pixeles_derecha, max_tamanyo=ancho,reverse=True)
 
-        if self.tam_img is None:
+        if self.tam_img is None or not redimensionar:
             self.tam_img = [x_fin - x_ini, y_fin - y_ini]
             return imagen[y_ini:y_fin, x_ini:x_fin]
         else:
             imagen_recortada = imagen[y_ini:y_fin, x_ini:x_fin]
             return self.redimensionarImagen(imagen_recortada, x_fin - x_ini, y_fin - y_ini)
 
-    def obtenerLimite(self, imagen, min_pixeles, max_tamanyo=0, reverse=False):
+    def obtenerBordeLetra(self, imagen_letra, min_pixeles, max_tamanyo=0, reverse=False):
         '''
         Dada una imagen, se corta por un lado a partir de que se supera "min_pixeles"
         si no se supera nunca se devuelve el mayor valor encontrado
         '''
         
-        l_valores = np.zeros(shape=imagen.size)
+        l_valores = np.zeros(shape=imagen_letra.size)
 
         if reverse:
-            # Se recorta la imagen a partir de que se supera min_pixeles
-            for i_fila, _ in enumerate(imagen[0]):
+            # Se recorta la imagen_letra a partir de que se supera min_pixeles
+            for i_fila, _ in enumerate(imagen_letra[0]):
 
-                # Se obtiene el numero de pixeles que son negros en la imagen
-                l_pixeles_negros = np.bincount(imagen[max_tamanyo - i_fila - 1 ])[:self.umbral]
+                # Se obtiene el numero de pixeles que son negros en la imagen_letra
+                l_pixeles_negros = np.bincount(imagen_letra[max_tamanyo - i_fila - 1 ])[:self.umbral]
                 n_pixeles_negros = np.sum(l_pixeles_negros)
 
                 # Si hay tantos o mas pixeles negros como el minimo numero
@@ -96,10 +96,10 @@ class Dataset():
                 if n_pixeles_negros >= min_pixeles:
                     return max_tamanyo - i_fila - 1
         else:
-            # Se recorta la imagen a partir de que se supera min_pixeles
-            for i_fila, fila in enumerate(imagen):
+            # Se recorta la imagen_letra a partir de que se supera min_pixeles
+            for i_fila, fila in enumerate(imagen_letra):
 
-                # Se obtiene el numero de pixeles que son negros en la imagen
+                # Se obtiene el numero de pixeles que son negros en la imagen_letra
                 l_pixeles_negros = np.bincount(fila)[:self.umbral]
                 n_pixeles_negros = np.sum(l_pixeles_negros)
 
@@ -112,6 +112,9 @@ class Dataset():
         return int(np.amax(l_valores))
 
     def redimensionarImagen(self, imagen, tam_h_actual, tam_v_actual):
+        '''
+        Dada una imagen, estira o encoge para que tenga las proporciones de "self.tam_img"
+        '''
 
         tam_h_actual -= 1
         tam_v_actual -= 1
@@ -159,7 +162,7 @@ class Dataset():
             # de un array 2D, de la que se extraen sus dimensiones
             primera_letra = self.datos_Bruto[0]
             if hacer_recorte:
-                primera_letra.array_pixels = self.recortar(primera_letra.array_pixels)
+                primera_letra.array_pixels = self.recortar(primera_letra.array_pixels, redimensionar=True)
             primer_dato = self.cuadraditos(primera_letra.array_pixels, primera_letra.clase, tamano)
             tam_fila_2d = primer_dato.shape[0]
             primer_dato = primer_dato.reshape(1, tam_fila_2d)
@@ -170,7 +173,7 @@ class Dataset():
 
             for letra in self.datos_Bruto[1:]:  # Resto de letras
                 if hacer_recorte:
-                    letra.array_pixels = self.recortar(letra.array_pixels)
+                    letra.array_pixels = self.recortar(letra.array_pixels, redimensionar=True)
 
                 dato = self.cuadraditos(letra.array_pixels, letra.clase, tamano)
                 dato = dato.reshape(1, tam_fila_2d)
@@ -178,14 +181,13 @@ class Dataset():
                 self.datos = np.append(self.datos, dato, axis=0)
                 #self.datos = np.append((self.datos, self.cuadraditos(letra.array_pixels, letra.clase, tamano)))
 
-
         elif tipo_atributo == "filas":
 
             # Convierte el array 1D devuelto por cuadraditosFilas (usando la primera letra) en una fila
             # de un array 2D, de la que se extraen sus dimensiones
             primera_letra = self.datos_Bruto[0]
             if hacer_recorte:
-                primera_letra.array_pixels = self.recortar(primera_letra.array_pixels)
+                primera_letra.array_pixels = self.recortar(primera_letra.array_pixels, redimensionar=True)
             primer_dato = self.cuadraditosFilas(primera_letra.array_pixels, primera_letra.clase, tamano)
             tam_fila_2d = primer_dato.shape[0]
             primer_dato = primer_dato.reshape(1, tam_fila_2d)
@@ -196,7 +198,7 @@ class Dataset():
 
             for letra in self.datos_Bruto[1:]:  # Resto de letras
                 if hacer_recorte:
-                    letra.array_pixels = self.recortar(letra.array_pixels)
+                    letra.array_pixels = self.recortar(letra.array_pixels, redimensionar=True)
 
                 dato = self.cuadraditosFilas(letra.array_pixels, letra.clase, tamano)
                 dato = dato.reshape(1, tam_fila_2d)
@@ -209,7 +211,7 @@ class Dataset():
             # de un array 2D, de la que se extraen sus dimensiones
             primera_letra = self.datos_Bruto[0]
             if hacer_recorte:
-                primera_letra.array_pixels = self.recortar(primera_letra.array_pixels)
+                primera_letra.array_pixels = self.recortar(primera_letra.array_pixels, redimensionar=True)
             primer_dato = self.cuadraditosColumnas(primera_letra.array_pixels, primera_letra.clase, tamano)
             tam_fila_2d = primer_dato.shape[0]
             primer_dato = primer_dato.reshape(1, tam_fila_2d)
@@ -220,7 +222,7 @@ class Dataset():
 
             for letra in self.datos_Bruto[1:]:  # Resto de letras
                 if hacer_recorte:
-                    letra.array_pixels = self.recortar(letra.array_pixels)
+                    letra.array_pixels = self.recortar(letra.array_pixels, redimensionar=True)
 
                 dato = self.cuadraditosColumnas(letra.array_pixels, letra.clase, tamano)
                 dato = dato.reshape(1, tam_fila_2d)
@@ -233,7 +235,7 @@ class Dataset():
             primera_letra = self.datos_Bruto[0]
 
             if hacer_recorte:
-                primera_letra.array_pixels = self.recortar(primera_letra.array_pixels)
+                primera_letra.array_pixels = self.recortar(primera_letra.array_pixels, redimensionar=True)
             if solo_blanco_negro:
                 primera_letra.array_pixels = self.todoBlancoNegro(primera_letra.array_pixels)
 
@@ -245,7 +247,7 @@ class Dataset():
 
             for letra in self.datos_Bruto:  # Resto de letras
                 if hacer_recorte:
-                    letra.array_pixels = self.recortar(letra.array_pixels)
+                    letra.array_pixels = self.recortar(letra.array_pixels, redimensionar=True)
 
                 if solo_blanco_negro:
                     letra.array_pixels = self.todoBlancoNegro(letra.array_pixels)
@@ -255,6 +257,30 @@ class Dataset():
                 dato = self.cuadraditosRandom(letra.array_pixels, letra.clase, l_cuadraditros,
                                                  porcentajeAgrupacion=porcentajeAgrupacion, solo_blanco_negro=solo_blanco_negro, random=random)
                 self.datos = np.concatenate((self.datos, np.array([dato])))
+        
+        elif tipo_atributo == "patrones":
+            
+            primera_letra = self.datos_Bruto[0]
+
+            if hacer_recorte:
+                primera_letra.array_pixels = self.recortar(primera_letra.array_pixels, porcentaje_umbral_recorte=[0.1, 0.05, 0.05, 0.15], redimensionar=True)
+            if solo_blanco_negro:
+                primera_letra.array_pixels = self.todoBlancoNegro(primera_letra.array_pixels)
+
+            self.datos = np.array([self.patrones(primera_letra.array_pixels, primera_letra.clase, solo_blanco_negro=solo_blanco_negro)])
+
+            for letra in self.datos_Bruto:  # Resto de letras
+                if hacer_recorte:
+                    letra.array_pixels = self.recortar(letra.array_pixels, redimensionar=True)
+
+                if solo_blanco_negro:
+                    letra.array_pixels = self.todoBlancoNegro(letra.array_pixels)
+
+                l_cuadraditros = self.crearCuadraditos(0, letra.array_pixels.shape[1], 0, letra.array_pixels.shape[0],
+                                                          n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
+                dato = self.patrones(letra.array_pixels, letra.clase, solo_blanco_negro=False)
+                self.datos = np.concatenate((self.datos, np.array([dato])))
+
         else:
             raise ValueError('Tipo de "tipo_atributo" ' + str(tipo_atributo) +' incorrecto.')
 
@@ -327,8 +353,7 @@ class Dataset():
 
         return letra
     
-    def cuadraditosRandom(self, imagen_letra, clase, l_cuadraditros, porcentajeAgrupacion=0.0,
-                          votacion="por_tamanyo", solo_blanco_negro=False, random=True):
+    def cuadraditosRandom(self, imagen_letra, clase, l_cuadraditros, porcentajeAgrupacion=0.0, votacion="por_tamanyo", solo_blanco_negro=False, random=True):
         '''
         Dada una imagen y unas coordenadas que definen los cuadraditos en los que
         se ha dividido la imagen (las coordenadas estan en la lista l_cuadraditos).
@@ -389,9 +414,72 @@ class Dataset():
     def cuadraditosDiagonales(self):
         pass
     
-    def patrones(self): #D
-        pass
-    
+    def patrones(self, imagen, clase, solo_blanco_negro=True):
+
+        ancho_rotulador = 22
+
+        mitad_v_imagen = imagen.shape[1]/2
+        mitad_h_imagen = imagen.shape[0]/2
+
+        l_corte_v = [0 for _ in range(8)]
+        l_corte_h = [0 for _ in range(8)]
+
+        l_corte_v[1] += l_corte_v[0] + ancho_rotulador
+        l_corte_h[1] += l_corte_h[0] + ancho_rotulador
+
+        l_corte_v[7] += imagen.shape[1]
+        l_corte_h[7] += imagen.shape[0]
+
+        l_corte_v[6] += l_corte_v[7] - ancho_rotulador
+        l_corte_h[6] += l_corte_h[7] - ancho_rotulador
+
+        l_corte_v[3] += int(mitad_v_imagen - ancho_rotulador/2)
+        l_corte_h[3] += int(mitad_h_imagen - ancho_rotulador/2)
+
+        l_corte_v[4] += int(mitad_v_imagen + ancho_rotulador/2)
+        l_corte_h[4] += int(mitad_h_imagen + ancho_rotulador/2)
+
+        l_corte_v[2] += int((l_corte_v[3] + l_corte_v[1]) / 2)
+        l_corte_h[2] += int((l_corte_h[3] + l_corte_h[1]) / 2)
+
+        l_corte_v[5] += int((l_corte_v[6] + l_corte_v[4]) / 2)
+        l_corte_h[5] += int((l_corte_h[6] + l_corte_h[4]) / 2)
+
+        '''
+        # Codigo para ver los cortes
+        l_cuadraditros = []
+        tam_l_cortes = len(l_corte_h)
+        for i in range(0, tam_l_cortes - 1):
+            for j in range(0, tam_l_cortes - 1):
+                l_cuadraditros.append([(l_corte_v[j], l_corte_v[j+1]), (l_corte_h[i], l_corte_h[i+1])])
+
+
+        imagenes = []
+        for cuadradito in l_cuadraditros:
+            imagen_recorte = imagen[cuadradito[1][0]:cuadradito[1][1], cuadradito[0][0]:cuadradito[0][1]]
+            imagenes.append(imagen_recorte)
+
+        self.mostrarImagenes(imagenes, columnas=7)
+        '''
+
+        atributos = []
+        tam_l_cortes = len(l_corte_h)
+        for i in range(0, tam_l_cortes - 1):
+            for j in range(0, tam_l_cortes - 1):
+                
+                if solo_blanco_negro:
+                    dato = self.colorMayoritario(imagen, l_corte_v[j], l_corte_v[j+1], l_corte_h[i], l_corte_h[i+1], resultados=False)
+
+                    dato = 1 if dato == 255 else 0
+                else:
+                    dato = self.mediaColores(imagen, [[(l_corte_v[j], l_corte_v[j+1]), (l_corte_h[i], l_corte_h[i+1])]])
+               
+                atributos.append(dato)
+
+
+        atributos.append(clase)
+        return np.array(atributos)
+
     def diferencia(self):
         pass
     
@@ -414,7 +502,7 @@ class Dataset():
     def negros(self):
         pass
 
-    def votarBlancoNegro(self, imagen, l_cuadraditros_atributo, votacion):
+    def votarBlancoNegro(self, imagen, l_cuadraditros_atributo, votacion=None):
         '''
         Se vota si hay mas blancos, 
         '''
@@ -444,6 +532,8 @@ class Dataset():
 
         zonas_coordenadas = np.array([], dtype=np.int)
 
+
+
         for c in l_cuadraditros_atributo:
             # Se obtiene la zona de la imagen que esta dentro de las coordenas
             zona_coordenadas = imagen[c[1][0]:c[1][1], c[0][0]:c[0][1]]
@@ -453,7 +543,7 @@ class Dataset():
 
         return np.mean(zonas_coordenadas)
 
-    def colorMayoritario(self, imagen, x_ini, x_fin, y_ini, y_fin):
+    def colorMayoritario(self, imagen, x_ini, x_fin, y_ini, y_fin, resultados=True):
         '''
         Dada una imagen y unas coordenadas de inicio y fin de la imagen se
         obtiene cual es el color mayoritario en el area de las coordenas
@@ -472,9 +562,14 @@ class Dataset():
         # Si no hay pixeles blancos la longitud del conteo sera < 2, 
         # asi que se devuelve que hay 0 pixeles blancos
         if conteo.size < 2:
-            return np.argmax(conteo), 0, conteo[0]
+            if resultados:
+                return np.argmax(conteo), 0, conteo[0]
+
         else:
-            return np.argmax(conteo), conteo[255], conteo[0]
+            if resultados:
+                return np.argmax(conteo), conteo[255], conteo[0]
+
+        return np.argmax(conteo)
 
     def crearCuadraditos(self, x_ini, x_fin, y_ini, y_fin, n_pixeles_ancho=None, n_pixeles_alto=None):
         '''

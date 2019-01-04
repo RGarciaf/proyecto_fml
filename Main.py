@@ -152,6 +152,7 @@ dataset.crearDataset(l_atributos, l_clases, ruta="ConjuntosDatos/", nombre="letr
 # de letras de la carpeta out y se probara la funcion recortar
 ####################################################################################################################
 
+'''
 dataset = Dataset(seed=1)
 
 imagen = mpimg.imread('out/l00000_A.png', True)
@@ -163,6 +164,35 @@ dataset.mostrarImagen(imagen_recortada)
 imagen = mpimg.imread('out/l00028_I.png', True)
 imagen_recortada = dataset.recortar(imagen, porcentaje_umbral_recorte=.1)
 dataset.mostrarImagen(imagen_recortada)
-imagen_recortada = dataset.recortar(imagen, porcentaje_umbral_recorte=[0.05, 0.1, 0.08, 0.08])
+imagen_recortada = dataset.recortar(imagen, porcentaje_umbral_recorte=0.1, redimensionar=False)
 dataset.mostrarImagen(imagen_recortada)
+'''
+
+
+####################################################################################################################
+# Comienzo de la seccion 6 del Main de prueba, en esta seccion se utilizaran la imagenes
+# de letras de la carpeta out y se probara la funcion patrones
+####################################################################################################################
+
+'''
+dataset = Dataset(seed=1)
+
+letras = "ABCDEFGHIJ"
+
+lista_imagenes = []
+for i in range(20, 29):
+    numero = str(100000 + i)
+    lista_imagenes.append(mpimg.imread('out/' + "l"+ numero[1:] + "_" + letras[i%10] + '.png', True))
+
+for i, imagen in enumerate(lista_imagenes):
+    imagen = dataset.todoBlancoNegro(imagen)
+    l_patrones = dataset.patrones(imagen, i%len(letras), solo_blanco_negro=True).tolist()
+    l_patrones.pop()
+
+    for i in range(0, len(l_patrones), 7):
+        print (l_patrones[i+0], l_patrones[i+1], l_patrones[i+2], l_patrones[i+3], l_patrones[i+4], l_patrones[i+5], l_patrones[i+6])
+    
+    print ()
+    print ()
+'''
 
