@@ -24,6 +24,8 @@ class Dataset():
         self.seed = seed
         #random.seed(self.seed)
         np.random.seed(self.seed)
+
+        self.procesarPrimeraFila()
     
     def recortar(self, imagen, porcentaje_umbral_recorte=0.05, redimensionar=True):
         '''
@@ -149,6 +151,12 @@ class Dataset():
             letra = self.Letra(celda_letra, i_celda_letra % len(string_clases))
             self.datos_Bruto.append(letra)
 
+        return
+
+    def procesarPrimeraFila(self):
+        for i, letra in enumerate(letritas.extrae_primera_fila()):
+            letra = self.Letra(letra, i)
+            self.primera_Linea.append(letra)
         return
 
     def procesarCuadraditos(self, tipo_atributo="cuadraditos", tamano=1,
@@ -479,24 +487,37 @@ class Dataset():
 
         atributos.append(clase)
         return np.array(atributos)
-
-    def diferencia(self):
-        pass
     
     def diferenciaPixel(self):
+        """
+        Para cada imagen se extrae como atributo la dieferencia del valor rgb de cada pixel 
+        con el pixel en la misma posicion de las imagenes a ordenador correspondientes a la clase
+        """
         datos = []
-        for i, (fotos, letra) in enumerate(zip(np.column_stack(self.datos_Bruto), self.primera_Linea)):
-            for foto in fotos:
-                datos.append(np.append([letra - foto,i]))
+        for foto in self.datos_Bruto:
+            for letra in self.primera_Linea:
+                if letra.clase == foto.clase:
+                    resta = np.array(letra.array_pixels) - np.array(foto.array_pixels)
+                    resta = np.append(np.append(resta,self.diferenciaPorcentajeAttr(foto, letra)) ,letra.clase)
+                    datos.append(resta.tolist())
+        self.datos = np.asarray(datos)
         return datos
-    
+
+    def diferenciaPorcentajeAttr(self,foto,letra):
+        sum_foto = np.sum(foto.array_pixels)/(len(foto.array_pixels)*len(foto.array_pixels[0]))
+        sum_letra = np.sum(letra.array_pixels)/(len(letra.array_pixels)*len(letra.array_pixels[0]))
+        return sum_letra - sum_foto
+
     def diferenciaPorcentaje(self):
+        
         datos = []
-        for i, (fotos, letra) in enumerate(zip(np.column_stack(self.datos_Bruto), self.primera_Linea)):
-            sum_letra = np.sum(letra)/(len(letra)*len(letra[0]))
-            for foto in fotos:
-                sum_foto = np.sum(foto)/(len(foto)*len(foto[0]))
-                datos.append([sum_letra - sum_foto,i])
+        for foto in self.datos_Bruto:
+            sum_foto = np.sum(foto.array_pixels)/(len(foto.array_pixels)*len(foto.array_pixels[0]))
+            for letra in self.primera_Linea:
+                if letra.clase == foto.clase:
+                    sum_letra = np.sum(letra.array_pixels)/(len(letra.array_pixels)*len(letra.array_pixels[0]))
+                    datos.append([sum_letra - sum_foto,letra.clase])
+        self.datos = np.asarray(datos)
         return datos
     
     def negros(self):

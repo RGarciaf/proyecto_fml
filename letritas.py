@@ -53,6 +53,29 @@ def detectar_lineas(imagen, eliminar_primera_fila=True):
     return [(ini,fin) for ini,fin in zip(cortes_h[:-1],cortes_h[1:])], \
            [(ini,fin) for ini,fin in zip(cortes_v[:-1],cortes_v[1:])]
     
+def detectar_lineas_pf(imagen):
+    """ Devuelve las parejas de posiciones en la imagen que 
+        corresponden con los cortes que vamos a hacer. Cada 
+        pareja indica el pixel inicio y final del corte. Entre 
+        medias está la imagen de la celda
+        Devuelve dos listas: una con los cortes horizontales y
+        otra con los verticales
+        Eliminamos la primera columna y las dos primeras filas
+    """
+    acumulado_v = np.sum(imagen, axis=0)/255/imagen.shape[0]
+    acumulado_h = np.sum(imagen, axis=1)/255/imagen.shape[1]
+
+    cortes_v = minimos(acumulado_v)
+    cortes_h = minimos(acumulado_h)
+    
+    #Eliminamos la primera columna y las dos primeras filas
+    cortes_v.pop(0)
+    cortes_h.pop(0)
+#     cortes_h.pop(0)
+    
+    return [(ini,fin) for ini,fin in zip(cortes_h[:-1],cortes_h[1:])], \
+           [(ini,fin) for ini,fin in zip(cortes_v[:-1],cortes_v[1:])]
+
 def extrae_cuadradito(imagen, corte_h, corte_v, alto, ancho):
     """ Extrae un recuadro de alto y ancho de la 'imagen'.
         El recuadro se extrae dentro de las coordenadas 
@@ -75,13 +98,18 @@ def extrae_cuadradito(imagen, corte_h, corte_v, alto, ancho):
     
     return imagen[h0:h1+1, v0:v1+1]
 
+def extrae_primera_fila():
+    imagen = mpimg.imread('imagenes/out-0032.png', True)
+    pf = []
+    h, v = detectar_lineas_pf(imagen)
+    for i in range(len(v)):
+        pf.append(extrae_cuadradito(imagen,h[0],v[i],206,150))
+    return pf
+
 def test():
     imagen = mpimg.imread('imagenes/out-0032.png', True)
     h, v = detectar_lineas(imagen)
     plt.imshow(extrae_cuadradito(imagen,h[np.random.randint(2,13)],v[np.random.randint(2,11)],200,150),cmap='gray')
-    
-#test()
-
 
 def extrae_celdas(nombres_imagenes, alto, ancho):
     """ A partir de una lista de imágenes extrae las celdas
@@ -89,7 +117,7 @@ def extrae_celdas(nombres_imagenes, alto, ancho):
     """
 
     celdas = []
-    for nombre_imagen in nombres_imagenes:
+    for nombre_imagen in nombres_imagenes[:1]:
         imagen             = mpimg.imread(nombre_imagen, True)
         
         cortes_h, cortes_v = detectar_lineas(imagen)
@@ -155,3 +183,7 @@ def run(get_params=parametros_por_defecto):
     guarda_celdas(celdas, clases, 'out')
     
     return np.array(celdas)
+
+
+if __name__ == "__main__":
+    test()

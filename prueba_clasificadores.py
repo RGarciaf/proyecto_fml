@@ -16,8 +16,10 @@ celdas = letritas.run(letritas.parametros_por_defecto)
 
 dataset = Dataset(seed=seed)
 dataset.procesarDatos(celdas)
+# dataset.diferenciaPixel()
 dataset.procesarCuadraditos("cuadraditos", 10)
 
+# print(dataset.datos)
 #dataset.procesarCuadraditos("patrones", 10, solo_blanco_negro=True, hacer_recorte=True)
 
 '''
