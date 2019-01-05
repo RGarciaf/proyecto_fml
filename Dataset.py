@@ -493,6 +493,24 @@ class Dataset():
         Para cada imagen se extrae como atributo la dieferencia del valor rgb de cada pixel 
         con el pixel en la misma posicion de las imagenes a ordenador correspondientes a la clase
         """
+        '''
+        # Codigo para ver como actua diferencia en una imagen especifica num_img
+        num_img = 1059
+        datos = []
+        for foto in self.datos_Bruto[num_img:num_img+1]:
+            for letra in self.primera_Linea:
+                #if letra.clase == foto.clase:
+                resta = np.array(self.todoBlancoNegro(letra.array_pixels)) - self.todoBlancoNegro(np.array(foto.array_pixels))
+                resta = np.append(np.append(resta,self.diferenciaPorcentajeAttr(foto, letra)) ,letra.clase)
+                datos.append(resta.tolist())
+        if arreglo == "+255":
+            self.datos = np.array(datos) + 255
+        elif arreglo == "abs":
+            self.datos = np.absolute(np.array(datos))
+        else:
+            raise ValueError ('Tipo de arreglo erroneo ' + str(arreglo) + ' solo se permite "+255" o "abs".')
+        return self.datos
+        '''
         datos = []
         for foto in self.datos_Bruto:
             for letra in self.primera_Linea:
