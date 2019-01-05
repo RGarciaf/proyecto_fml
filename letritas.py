@@ -71,7 +71,7 @@ def detectar_lineas_pf(imagen):
     #Eliminamos la primera columna y las dos primeras filas
     cortes_v.pop(0)
     cortes_h.pop(0)
-#     cortes_h.pop(0)
+    #cortes_h.pop(0)
     
     return [(ini,fin) for ini,fin in zip(cortes_h[:-1],cortes_h[1:])], \
            [(ini,fin) for ini,fin in zip(cortes_v[:-1],cortes_v[1:])]

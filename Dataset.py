@@ -500,8 +500,8 @@ class Dataset():
                     resta = np.array(letra.array_pixels) - np.array(foto.array_pixels)
                     resta = np.append(np.append(resta,self.diferenciaPorcentajeAttr(foto, letra)) ,letra.clase)
                     datos.append(resta.tolist())
-        self.datos = np.asarray(datos)
-        return datos
+        self.datos = np.absolute(np.array(datos))
+        return self.datos
 
     def diferenciaPorcentajeAttr(self,foto,letra):
         sum_foto = np.sum(foto.array_pixels)/(len(foto.array_pixels)*len(foto.array_pixels[0]))
@@ -517,8 +517,8 @@ class Dataset():
                 if letra.clase == foto.clase:
                     sum_letra = np.sum(letra.array_pixels)/(len(letra.array_pixels)*len(letra.array_pixels[0]))
                     datos.append([sum_letra - sum_foto,letra.clase])
-        self.datos = np.asarray(datos)
-        return datos
+        self.datos = np.absolute(np.array(datos))
+        return self.datos
     
     def negros(self):
         pass
