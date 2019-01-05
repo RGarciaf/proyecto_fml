@@ -22,7 +22,7 @@ for nombre_imagen in nombres_imagenes:
 
 dataset = Dataset(seed=seed)
 dataset.procesarDatos(celdas)
-dataset.diferenciaPixel()
+dataset.diferenciaPixel(arreglo="abs")
 
 
 

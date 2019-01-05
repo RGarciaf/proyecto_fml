@@ -71,26 +71,39 @@ dataset.mostrarImagenes(imagenes, columnas=num_columnas)
 # Comienzo de la seccion 2 del Main de prueba, en esta seccion se utilizaran la imagenes
 # de letras de la carpeta out y se mostrara el funcionamientos de la funcion mostrarImagenes
 ####################################################################################################################
-'''
-n_pixeles_ancho = 100
-n_pixeles_alto = 100
+
+
+n_pixeles_ancho = 20
+n_pixeles_alto = 20
 
 dataset = Dataset(seed=1)
 
 imagen = mpimg.imread('out/l00000_A.png', True)
 imagenBN = dataset.todoBlancoNegro(imagen)
 
+
+
 l_cuadraditros = dataset.crearCuadraditos(0, imagenBN.shape[1], 0, imagenBN.shape[0], n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
-dataset.cuadraditosRandom(imagenBN, l_cuadraditros, porcentajeAgrupacion=0.1, solo_blanco_negro=True, random=False)
+dataset.cuadraditosRandom(imagenBN, 0, l_cuadraditros, porcentajeAgrupacion=0.1, solo_blanco_negro=False, random=False)
 
 
 imagenes = []
+tam_base = -1
 for cuadradito in l_cuadraditros:
-    imagen_recorte = imagenBN[cuadradito[1][0]:cuadradito[1][1], cuadradito[0][0]:cuadradito[0][1]]
-    imagenes.append(imagen_recorte)
+    if tam_base != -1:
+        imagen_recorte = imagenBN[cuadradito[1][0]:cuadradito[1][1], cuadradito[0][0]:cuadradito[0][1]]
+        if imagen_recorte.size >= 0.8*tam_base:
+            imagenes.append(imagen_recorte)
+    else:
 
-dataset.mostrarImagenes(imagenes, columnas=math.ceil(imagenBN.shape[1]/n_pixeles_ancho))
-'''
+        imagen_recorte = imagenBN[cuadradito[1][0]:cuadradito[1][1], cuadradito[0][0]:cuadradito[0][1]]
+        imagenes.append(imagen_recorte)
+        tam_base = imagen_recorte.size
+
+
+dataset.mostrarImagenes(imagenes, math.floor(imagenBN.shape[1]/n_pixeles_ancho))
+
+
 ####################################################################################################################
 # Comienzo de la seccion 3 del Main de prueba, en esta seccion se utilizaran la imagenes
 # de letras de la carpeta out y se mostrara el funcionamientos de la funcion random
@@ -158,7 +171,7 @@ dataset = Dataset(seed=1)
 imagen = mpimg.imread('out/l00000_A.png', True)
 imagen_recortada = dataset.recortar(imagen, porcentaje_umbral_recorte=.1)
 dataset.mostrarImagen(imagen_recortada)
-imagen_recortada = dataset.recortar(imagen, porcentaje_umbral_recorte=[0.05, 0.1, 0.08, 0.08])
+imagen_recortada = dataset.recortar(imagen, porcentaje_umbral_recorte=[0.22, 0.22, 0.08, 0.08], redimensionar=False)
 dataset.mostrarImagen(imagen_recortada)
 
 imagen = mpimg.imread('out/l00028_I.png', True)
@@ -184,11 +197,14 @@ for i in range(20, 29):
     numero = str(100000 + i)
     lista_imagenes.append(mpimg.imread('out/' + "l"+ numero[1:] + "_" + letras[i%10] + '.png', True))
 
-for i, imagen in enumerate(lista_imagenes):
-    imagen = dataset.todoBlancoNegro(imagen)
-    l_patrones = dataset.patrones(imagen, i%len(letras), solo_blanco_negro=True).tolist()
+for i, imagen in enumerate(lista_imagenes[0:1]):
+    #imagen = dataset.todoBlancoNegro(imagen)
+    imagen = dataset.recortar(imagen, porcentaje_umbral_recorte=[0.1, 0.05, 0.05, 0.15], redimensionar=True)
+    l_patrones = dataset.patrones(imagen, i%len(letras), solo_blanco_negro=False).tolist()
     l_patrones.pop()
+'''
 
+'''    
     for i in range(0, len(l_patrones), 7):
         print (l_patrones[i+0], l_patrones[i+1], l_patrones[i+2], l_patrones[i+3], l_patrones[i+4], l_patrones[i+5], l_patrones[i+6])
     
@@ -196,7 +212,11 @@ for i, imagen in enumerate(lista_imagenes):
     print ()
 '''
 
+'''
+print (l_patrones)
+imagenes = []
+for cuadradito in l_patrones:
+    imagenes.append(imagen[cuadradito[1][0]:cuadradito[1][1], cuadradito[0][0]:cuadradito[0][1]])
 
-dataset = Dataset(seed=1)
-l_atributos=[[1,2,3,4,5,6,0],[1,2,3,4,5,6,1],[1,2,3,4,5,6,2],[1,2,3,4,5,6,3]]
-dataset.crearDataset(l_atributos)
+dataset.mostrarImagenes(imagenes, 7)#math.floor(imagen.shape[1]/n_pixeles_ancho))
+'''
