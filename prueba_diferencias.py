@@ -24,8 +24,13 @@ dataset = Dataset(seed=seed)
 dataset.procesarDatos(celdas)
 dataset.diferenciaPixel(arreglo="abs")
 
+imagenes = []
+for imag in dataset.datos:
+	imagenes.append(np.reshape(imag[:-2], (206,150)))
 
+dataset.mostrarImagenes(imagenes, 5)
 
+'''
 val_cruzada = EstrategiaParticionadoSL.ValidacionCruzadaSL(numeroParticiones=5)
 
 
@@ -114,4 +119,4 @@ print("Random Forest")
 print("Aciertos particion: " + str(aciertos_particion))
 print("Media: " + str(statistics.mean(aciertos_particion)))
 print("Desv tipica: " + str(statistics.stdev(aciertos_particion)))
-
+'''

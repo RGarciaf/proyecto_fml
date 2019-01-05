@@ -453,7 +453,7 @@ class Dataset():
         l_corte_v[5] += int((l_corte_v[6] + l_corte_v[4]) / 2)
         l_corte_h[5] += int((l_corte_h[6] + l_corte_h[4]) / 2)
 
-        
+        '''
         # Codigo para ver los cortes
         l_cuadraditros = []
         tam_l_cortes = len(l_corte_h)
@@ -468,7 +468,7 @@ class Dataset():
             imagenes.append(imagen_recorte)
 
         self.mostrarImagenes(imagenes, columnas=7)
-        
+        '''
 
         atributos = []
         tam_l_cortes = len(l_corte_h)
