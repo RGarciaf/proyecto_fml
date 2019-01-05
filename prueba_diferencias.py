@@ -35,10 +35,11 @@ else:
     print("GaussianNB")
 #print("Errores particion: " + str(errores_particion))
 #print("Media: " + str(statistics.mean(errores_particion)))
+#print("Desv tipica: " + str(statistics.std(errores_particion)))
 
 print("Aciertos particion: " + str(aciertos_particion))
 print("Media: " + str(statistics.mean(aciertos_particion)))
-print("Desv tipica: " + str(statistics.mean(aciertos_particion)))
+print("Desv tipica: " + str(statistics.std(aciertos_particion)))
 print()
 
 
@@ -51,9 +52,11 @@ aciertos_particion = [(1 - elem) for elem in errores_particion]
 print("KNN")
 #print("Errores particion: " + str(errores_particion))
 #print("Media: " + str(statistics.mean(errores_particion)))
+#print("Desv tipica: " + str(statistics.std(errores_particion)))
 
 print("Aciertos particion: " + str(aciertos_particion))
 print("Media: " + str(statistics.mean(aciertos_particion)))
+print("Desv tipica: " + str(statistics.std(aciertos_particion)))
 print()
 
 # Prueba clasificador Regresion Logistica
@@ -65,9 +68,11 @@ aciertos_particion = [(1 - elem) for elem in errores_particion]
 print("Regresion Logistica")
 #print("Errores particion: " + str(errores_particion))
 #print("Media: " + str(statistics.mean(errores_particion)))
+#print("Desv tipica: " + str(statistics.std(errores_particion)))
 
 print("Aciertos particion: " + str(aciertos_particion))
 print("Media: " + str(statistics.mean(aciertos_particion)))
+print("Desv tipica: " + str(statistics.std(aciertos_particion)))
 print()
 
 
@@ -80,9 +85,11 @@ aciertos_particion = [(1 - elem) for elem in errores_particion]
 print("Arbol de Decision")
 #print("Errores particion: " + str(errores_particion))
 #print("Media: " + str(statistics.mean(errores_particion)))
+#print("Desv tipica: " + str(statistics.std(errores_particion)))
 
 print("Aciertos particion: " + str(aciertos_particion))
 print("Media: " + str(statistics.mean(aciertos_particion)))
+print("Desv tipica: " + str(statistics.std(aciertos_particion)))
 print()
 
 
@@ -95,7 +102,9 @@ aciertos_particion = [(1 - elem) for elem in errores_particion]
 print("Random Forest")
 #print("Errores particion: " + str(errores_particion))
 #print("Media: " + str(statistics.mean(errores_particion)))
+#print("Desv tipica: " + str(statistics.std(errores_particion)))
 
 print("Aciertos particion: " + str(aciertos_particion))
 print("Media: " + str(statistics.mean(aciertos_particion)))
+print("Desv tipica: " + str(statistics.std(aciertos_particion)))
 
