@@ -196,3 +196,7 @@ for i, imagen in enumerate(lista_imagenes):
     print ()
 '''
 
+
+dataset = Dataset(seed=1)
+l_atributos=[[1,2,3,4,5,6,0],[1,2,3,4,5,6,1],[1,2,3,4,5,6,2],[1,2,3,4,5,6,3]]
+dataset.crearDataset(l_atributos)

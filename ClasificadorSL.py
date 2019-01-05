@@ -65,6 +65,9 @@ class ClasificadorNB_SL(ClasificadorSL):
             X_test = datostest[:, : -1]
             Y_test = datostest[:, -1]
 
+
+            #raise ValueError ("Y_train", Y_train, "Y_test", Y_test)
+
             # Se entrena el modelo MultinomialNB y se clasifica
             clasificadorSL.modelo = MultinomialNB(alpha=clasificadorSL.correccion_Laplace)
             clasificadorSL.entrenamiento(X_train, Y_train)

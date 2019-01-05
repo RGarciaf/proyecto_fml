@@ -488,7 +488,7 @@ class Dataset():
         atributos.append(clase)
         return np.array(atributos)
     
-    def diferenciaPixel(self):
+    def diferenciaPixel(self, arreglo="+255"):
         """
         Para cada imagen se extrae como atributo la dieferencia del valor rgb de cada pixel 
         con el pixel en la misma posicion de las imagenes a ordenador correspondientes a la clase
@@ -500,7 +500,12 @@ class Dataset():
                     resta = np.array(letra.array_pixels) - np.array(foto.array_pixels)
                     resta = np.append(np.append(resta,self.diferenciaPorcentajeAttr(foto, letra)) ,letra.clase)
                     datos.append(resta.tolist())
-        self.datos = np.absolute(np.array(datos))
+        if arreglo == "+255":
+            self.datos = np.array(datos) + 255
+        elif arreglo == "abs":
+            self.datos = np.absolute(np.array(datos))
+        else:
+            raise ValueError ('Tipo de arreglo erroneo ' + str(arreglo) + ' solo se permite "+255" o "abs".')
         return self.datos
 
     def diferenciaPorcentajeAttr(self,foto,letra):
@@ -508,7 +513,7 @@ class Dataset():
         sum_letra = np.sum(letra.array_pixels)/(len(letra.array_pixels)*len(letra.array_pixels[0]))
         return sum_letra - sum_foto
 
-    def diferenciaPorcentaje(self):
+    def diferenciaPorcentaje(self, arreglo="+255"):
         
         datos = []
         for foto in self.datos_Bruto:
@@ -517,7 +522,12 @@ class Dataset():
                 if letra.clase == foto.clase:
                     sum_letra = np.sum(letra.array_pixels)/(len(letra.array_pixels)*len(letra.array_pixels[0]))
                     datos.append([sum_letra - sum_foto,letra.clase])
-        self.datos = np.absolute(np.array(datos))
+        if arreglo == "+255":
+            self.datos = np.array(datos) + 255
+        elif arreglo == "abs":
+            self.datos = np.absolute(np.array(datos))
+        else:
+            raise ValueError ('Tipo de arreglo erroneo ' + str(arreglo) + ' solo se permite "+255" o "abs".')
         return self.datos
     
     def negros(self):

@@ -13,11 +13,18 @@ np.set_printoptions(threshold=np.nan)
 seed=1
 
 # Generar el dataset y la estrategia de particionado
-celdas = letritas.run(letritas.parametros_por_defecto)
+#celdas = letritas.run(letritas.parametros_por_defecto)
+
+nombres_imagenes = sorted(letritas.parametros_por_defecto("out/")[0])
+celdas = []
+for nombre_imagen in nombres_imagenes:
+    celdas.append(mpimg.imread(nombre_imagen, True))
 
 dataset = Dataset(seed=seed)
 dataset.procesarDatos(celdas)
 dataset.diferenciaPixel()
+
+
 
 val_cruzada = EstrategiaParticionadoSL.ValidacionCruzadaSL(numeroParticiones=5)
 

@@ -12,7 +12,11 @@ np.set_printoptions(threshold=np.nan)
 seed=1
 
 # Generar el dataset y la estrategia de particionado
-celdas = letritas.run(letritas.parametros_por_defecto)
+#celdas = letritas.run(letritas.parametros_por_defecto)
+nombres_imagenes = sorted(letritas.parametros_por_defecto("out/")[0])
+celdas = []
+for nombre_imagen in nombres_imagenes:
+    celdas.append(mpimg.imread(nombre_imagen, True))
 
 dataset = Dataset(seed=seed)
 dataset.procesarDatos(celdas)
@@ -22,13 +26,9 @@ dataset.procesarCuadraditos("cuadraditos", 10)
 # print(dataset.datos)
 #dataset.procesarCuadraditos("patrones", 10, solo_blanco_negro=True, hacer_recorte=True)
 
+
+
 '''
-nombres_imagenes = sorted(letritas.parametros_por_defecto("out/")[0])
-celdas = []
-for nombre_imagen in nombres_imagenes:
-    celdas.append(mpimg.imread(nombre_imagen, True))
-
-
 tipo_atributo="random"
 n_pixeles_ancho=10
 n_pixeles_alto=n_pixeles_ancho
