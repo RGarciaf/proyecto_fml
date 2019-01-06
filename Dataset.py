@@ -335,9 +335,7 @@ class Dataset():
             
             # Codifica los pixeles de media a 0s o 1s y annade la clase
             if solo_blanco_negro:
-                letra = self.convertirPixeles(media)
-            else:
-                letra = media
+                letra = self.convertirPixeles(letra)
             
             letra = np.append(letra, clase)
         else:
