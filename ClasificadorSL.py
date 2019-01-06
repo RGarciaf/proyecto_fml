@@ -5,7 +5,7 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
-
+from sklearn.metrics import confusion_matrix
 
 class ClasificadorSL(object):
 
@@ -25,6 +25,11 @@ class ClasificadorSL(object):
         # accuracy_score compara las predicciones con las clases_reales y se calcula el error
         return round((1 - accuracy_score(clases_reales, predicciones)), 5)
 
+    # Obtiene la matriz de confusion correspondiente
+    def matrizConfusion(self, clases_reales, predicciones):
+        # confusion_matrix compara las predicciones con las clases_reales y se calcula la matriz de confusion
+        return confusion_matrix(clases_reales, predicciones)
+
     # Crea las particiones, entrena al clasificador y obtiene los porcentajes de error por cada particion
     @abstractmethod
     def validacion(self, particionadoSL, dataset, clasificadorSL, seed=None):
@@ -41,6 +46,8 @@ class ClasificadorNB_SL(ClasificadorSL):
         self.correccion_Laplace = correccion_Laplace
         self.modelo = None
 
+        self.matriz_confusion = None
+
 
     # Valida el modelo GaussianNB usando una estrategia de particionado determinada (tambien implementada con Scikit-learn)
     def validacion(self, particionadoSL, dataset, clasificadorSL, seed=None):
@@ -48,6 +55,9 @@ class ClasificadorNB_SL(ClasificadorSL):
         # Se inicializan las listas de errores de las particiones
         errores_particion_MultinomialNB = []
         errores_particion_GaussianNB = []
+
+        m_conf_particion_MultinomialNB = None
+        m_conf_particion_GaussianNB = None
 
         # Crea las particiones de train y test
         particionadoSL.listaParticiones = []  # Reset de la lista por si se quiere ejecutar el codigo mas de una vez
@@ -65,9 +75,6 @@ class ClasificadorNB_SL(ClasificadorSL):
             X_test = datostest[:, : -1]
             Y_test = datostest[:, -1]
 
-
-            #raise ValueError ("Y_train", Y_train, "Y_test", Y_test)
-
             # Se entrena el modelo MultinomialNB y se clasifica
             clasificadorSL.modelo = MultinomialNB(alpha=clasificadorSL.correccion_Laplace)
             clasificadorSL.entrenamiento(X_train, Y_train)
@@ -76,6 +83,10 @@ class ClasificadorNB_SL(ClasificadorSL):
 
             # Se obtiene el error en las clasificaciones de MultinomialNB
             errores_particion_MultinomialNB.append(clasificadorSL.error(Y_test, predicciones))
+            if m_conf_particion_MultinomialNB is None:
+                m_conf_particion_MultinomialNB = clasificadorSL.matrizConfusion(Y_test, predicciones)
+            else:
+                m_conf_particion_MultinomialNB += clasificadorSL.matrizConfusion(Y_test, predicciones)
 
             # Se entrena el modelo GaussianNB y se clasifica
             clasificadorSL.modelo = GaussianNB()
@@ -85,17 +96,25 @@ class ClasificadorNB_SL(ClasificadorSL):
 
             # Se obtiene el error en las clasificaciones de GaussianNB
             errores_particion_GaussianNB.append(clasificadorSL.error(Y_test, predicciones))
+            if m_conf_particion_GaussianNB is None:
+                m_conf_particion_GaussianNB = clasificadorSL.matrizConfusion(Y_test, predicciones)
+            else:
+                m_conf_particion_GaussianNB += clasificadorSL.matrizConfusion(Y_test, predicciones)
 
         # Comprueba que modelo ha tenido menos error
         if sum(errores_particion_MultinomialNB) < sum(errores_particion_GaussianNB):
             # Si se ha obtenido menos error con MultinomialNB se devuelve el
             # error de MultinomialNB (el flag Multinomial_flag ya esta a True)
+
+            self.matriz_confusion = m_conf_particion_MultinomialNB/(len(particionadoSL.listaParticiones))
             return errores_particion_MultinomialNB
 
         else:
             # Si se ha obtenido menos error con GaussianNB se devuelve el
             # error de GaussianNB y se pone a False el flag Multinomial_flag
             clasificadorSL.Multinomial_flag = False
+
+            self.matriz_confusion = m_conf_particion_GaussianNB/(len(particionadoSL.listaParticiones))
             return errores_particion_GaussianNB
 
 ########################################################################################################################
@@ -115,6 +134,8 @@ class ClasificadorKNN_SL(ClasificadorSL):
         self.tipo_peso = tipo_peso
         self.K = K
         self.modelo = KNeighborsClassifier(n_neighbors=self.K, weights=self.tipo_peso)
+
+        self.matriz_confusion = None
 
 
     # Valida el modelo KNN usando una estrategia de particionado determinada (tambien implementada con Scikit-learn)
@@ -145,7 +166,13 @@ class ClasificadorKNN_SL(ClasificadorSL):
 
             # Se obtiene el error en las clasificaciones
             errores_particion.append(clasificadorSL.error(Y_test, predicciones))
+            if self.matriz_confusion is None:
+                self.matriz_confusion = clasificadorSL.matrizConfusion(Y_test, predicciones)
+            else:
+                self.matriz_confusion += clasificadorSL.matrizConfusion(Y_test, predicciones)
 
+
+        self.matriz_confusion = self.matriz_confusion/(len(particionadoSL.listaParticiones))
         # Se devuelve la lista de errores en las clasificaciones
         return errores_particion
 
@@ -160,6 +187,8 @@ class ClasificadorRegLog_SL(ClasificadorSL):
         self.cte_aprendizaje = cte_aprendizaje
         self.modelo = SGDClassifier(loss='log', alpha=self.cte_aprendizaje, \
                                         learning_rate='optimal', max_iter=self.num_epocas)
+
+        self.matriz_confusion = None
 
 
     # Valida el modelo SGDClassifier usando una estrategia de particionado determinada (tambien implementada con Scikit-learn)
@@ -189,7 +218,13 @@ class ClasificadorRegLog_SL(ClasificadorSL):
 
             # Se obtiene el error en las clasificaciones
             errores_particion.append(clasificadorSL.error(Y_test, predicciones))
+            if self.matriz_confusion is None:
+                self.matriz_confusion = clasificadorSL.matrizConfusion(Y_test, predicciones)
+            else:
+                self.matriz_confusion += clasificadorSL.matrizConfusion(Y_test, predicciones)
 
+
+        self.matriz_confusion = self.matriz_confusion/(len(particionadoSL.listaParticiones))
         # Se devuelve la lista de errores en las clasificaciones
         return errores_particion
 
@@ -205,6 +240,8 @@ class ClasificadorArbolDecision_SL(ClasificadorSL):
         self.min_ejemplos_en_hoja = min_ejemplos_en_hoja
         self.modelo = DecisionTreeClassifier(max_depth=self.profundidad_maxima, min_samples_split=self.min_ejemplos_split, \
                                              min_samples_leaf=self.min_ejemplos_en_hoja)
+
+        self.matriz_confusion = None
 
 
     # Valida el modelo DecisionTreeClassifier usando una estrategia de particionado determinada (tambien implementada con Scikit-learn)
@@ -234,7 +271,13 @@ class ClasificadorArbolDecision_SL(ClasificadorSL):
 
             # Se obtiene el error en las clasificaciones
             errores_particion.append(clasificadorSL.error(Y_test, predicciones))
+            if self.matriz_confusion is None:
+                self.matriz_confusion = clasificadorSL.matrizConfusion(Y_test, predicciones)
+            else:
+                self.matriz_confusion += clasificadorSL.matrizConfusion(Y_test, predicciones)
 
+
+        self.matriz_confusion = self.matriz_confusion/(len(particionadoSL.listaParticiones))
         # Se devuelve la lista de errores en las clasificaciones
         return errores_particion
 
@@ -251,6 +294,8 @@ class ClasificadorRandomForest_SL(ClasificadorSL):
         self.min_ejemplos_en_hoja = min_ejemplos_en_hoja
         self.modelo = RandomForestClassifier(n_estimators=self.num_estimadores, max_depth=self.profundidad_maxima, \
                                              min_samples_split=self.min_ejemplos_split, min_samples_leaf=self.min_ejemplos_en_hoja)
+
+        self.matriz_confusion = None
 
 
     # Valida el modelo RandomForestClassifier usando una estrategia de particionado determinada (tambien implementada con Scikit-learn)
@@ -280,6 +325,12 @@ class ClasificadorRandomForest_SL(ClasificadorSL):
 
             # Se obtiene el error en las clasificaciones
             errores_particion.append(clasificadorSL.error(Y_test, predicciones))
+            if self.matriz_confusion is None:
+                self.matriz_confusion = clasificadorSL.matrizConfusion(Y_test, predicciones)
+            else:
+                self.matriz_confusion += clasificadorSL.matrizConfusion(Y_test, predicciones)
 
+
+        self.matriz_confusion = self.matriz_confusion/(len(particionadoSL.listaParticiones))
         # Se devuelve la lista de errores en las clasificaciones
         return errores_particion

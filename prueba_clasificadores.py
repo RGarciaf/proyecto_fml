@@ -18,6 +18,7 @@ celdas = []
 for nombre_imagen in nombres_imagenes:
     celdas.append(mpimg.imread(nombre_imagen, True))
 
+'''
 dataset = Dataset(seed=seed)
 dataset.procesarDatos(celdas)
 # dataset.diferenciaPixel()
@@ -25,18 +26,19 @@ dataset.procesarCuadraditos("cuadraditos", 10)
 
 # print(dataset.datos)
 #dataset.procesarCuadraditos("patrones", 10, solo_blanco_negro=True, hacer_recorte=True)
-
-
-
 '''
-tipo_atributo="random"
-n_pixeles_ancho=10
+
+
+tipo_atributo="cuadraditos"
+tamano=9
+n_pixeles_ancho=9
 n_pixeles_alto=n_pixeles_ancho
-porcentajeAgrupacion=0.0
+porcentajeAgrupacion=0.1
 solo_blanco_negro=True
 random=False
 hacer_recorte=False
 print ("tipo_atributo\t\t", tipo_atributo)
+print ("tamano\t\t\t", tamano)
 print ("n_pixeles_ancho\t\t", n_pixeles_ancho)
 print ("n_pixeles_alto\t\t", n_pixeles_alto)
 print ("porcentajeAgrupacion\t", porcentajeAgrupacion)
@@ -46,19 +48,18 @@ print ("hacer_recorte\t\t", str(hacer_recorte) + "\n\n")
 
 dataset = Dataset(seed=seed)
 dataset.procesarDatos(celdas)
-dataset.procesarCuadraditos(tipo_atributo, tamano=10,
+dataset.procesarCuadraditos(tipo_atributo, tamano=tamano,
                             n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto,
                             porcentajeAgrupacion=porcentajeAgrupacion, solo_blanco_negro=solo_blanco_negro,
                             random=random, hacer_recorte=hacer_recorte)
-'''
 
 
 val_cruzada = EstrategiaParticionadoSL.ValidacionCruzadaSL(numeroParticiones=5)
 
 
+
 # Prueba clasificador NB
 clasificadorSL_NB = ClasificadorSL.ClasificadorNB_SL()
-
 
 errores_particion = clasificadorSL_NB.validacion(val_cruzada, dataset, clasificadorSL_NB, seed=seed)
 aciertos_particion = [(1 - elem) for elem in errores_particion]
@@ -74,6 +75,7 @@ else:
 print("Aciertos particion: " + str(aciertos_particion))
 print("Media: " + str(statistics.mean(aciertos_particion)))
 print("Desv tipica: " + str(statistics.stdev(aciertos_particion)))
+print("matriz confusion:\n" + str(clasificadorSL_NB.matriz_confusion))
 print()
 
 
@@ -91,7 +93,9 @@ print("KNN")
 print("Aciertos particion: " + str(aciertos_particion))
 print("Media: " + str(statistics.mean(aciertos_particion)))
 print("Desv tipica: " + str(statistics.stdev(aciertos_particion)))
+print("matriz confusion:\n" + str(clasificadorSL_KNN.matriz_confusion))
 print()
+
 
 # Prueba clasificador Regresion Logistica
 clasificadorSL_RegLog = ClasificadorSL.ClasificadorRegLog_SL(num_epocas=10)
@@ -107,6 +111,7 @@ print("Regresion Logistica")
 print("Aciertos particion: " + str(aciertos_particion))
 print("Media: " + str(statistics.mean(aciertos_particion)))
 print("Desv tipica: " + str(statistics.stdev(aciertos_particion)))
+print("matriz confusion:\n" + str(clasificadorSL_RegLog.matriz_confusion))
 print()
 
 
@@ -124,6 +129,7 @@ print("Arbol de Decision")
 print("Aciertos particion: " + str(aciertos_particion))
 print("Media: " + str(statistics.mean(aciertos_particion)))
 print("Desv tipica: " + str(statistics.stdev(aciertos_particion)))
+print("matriz confusion:\n" + str(clasificadorSL_ArbolDecision.matriz_confusion))
 print()
 
 
@@ -141,4 +147,4 @@ print("Random Forest")
 print("Aciertos particion: " + str(aciertos_particion))
 print("Media: " + str(statistics.mean(aciertos_particion)))
 print("Desv tipica: " + str(statistics.stdev(aciertos_particion)))
-
+print("matriz confusion:\n" + str(clasificadorSL_RandomForest.matriz_confusion))
