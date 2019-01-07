@@ -42,7 +42,7 @@ class ClasificadorNB_SL(ClasificadorSL):
 
     # Constructor de la clase
     def __init__(self, correccion_Laplace=1.0):
-        self.Multinomial_flag = True
+        #self.Multinomial_flag = True
         self.correccion_Laplace = correccion_Laplace
         self.modelo = None
 
@@ -53,10 +53,10 @@ class ClasificadorNB_SL(ClasificadorSL):
     def validacion(self, particionadoSL, dataset, clasificadorSL, seed=None):
 
         # Se inicializan las listas de errores de las particiones
-        errores_particion_MultinomialNB = []
+        #errores_particion_MultinomialNB = []
         errores_particion_GaussianNB = []
 
-        m_conf_particion_MultinomialNB = None
+        #m_conf_particion_MultinomialNB = None
         m_conf_particion_GaussianNB = None
 
         # Crea las particiones de train y test
@@ -76,17 +76,17 @@ class ClasificadorNB_SL(ClasificadorSL):
             Y_test = datostest[:, -1]
 
             # Se entrena el modelo MultinomialNB y se clasifica
-            clasificadorSL.modelo = MultinomialNB(alpha=clasificadorSL.correccion_Laplace)
-            clasificadorSL.entrenamiento(X_train, Y_train)
+            #clasificadorSL.modelo = MultinomialNB(alpha=clasificadorSL.correccion_Laplace)
+            #clasificadorSL.entrenamiento(X_train, Y_train)
 
-            predicciones = clasificadorSL.clasifica(X_test)
+            #predicciones = clasificadorSL.clasifica(X_test)
 
             # Se obtiene el error en las clasificaciones de MultinomialNB
-            errores_particion_MultinomialNB.append(clasificadorSL.error(Y_test, predicciones))
-            if m_conf_particion_MultinomialNB is None:
-                m_conf_particion_MultinomialNB = clasificadorSL.matrizConfusion(Y_test, predicciones)
-            else:
-                m_conf_particion_MultinomialNB += clasificadorSL.matrizConfusion(Y_test, predicciones)
+            #errores_particion_MultinomialNB.append(clasificadorSL.error(Y_test, predicciones))
+            #if m_conf_particion_MultinomialNB is None:
+            #    m_conf_particion_MultinomialNB = clasificadorSL.matrizConfusion(Y_test, predicciones)
+            #else:
+            #    m_conf_particion_MultinomialNB += clasificadorSL.matrizConfusion(Y_test, predicciones)
 
             # Se entrena el modelo GaussianNB y se clasifica
             clasificadorSL.modelo = GaussianNB()
@@ -101,21 +101,21 @@ class ClasificadorNB_SL(ClasificadorSL):
             else:
                 m_conf_particion_GaussianNB += clasificadorSL.matrizConfusion(Y_test, predicciones)
 
-        # Comprueba que modelo ha tenido menos error
-        if sum(errores_particion_MultinomialNB) < sum(errores_particion_GaussianNB):
-            # Si se ha obtenido menos error con MultinomialNB se devuelve el
-            # error de MultinomialNB (el flag Multinomial_flag ya esta a True)
+        ## Comprueba que modelo ha tenido menos error
+        #if sum(errores_particion_MultinomialNB) < sum(errores_particion_GaussianNB):
+        #    # Si se ha obtenido menos error con MultinomialNB se devuelve el
+        #    # error de MultinomialNB (el flag Multinomial_flag ya esta a True)
 
-            self.matriz_confusion = m_conf_particion_MultinomialNB/(len(particionadoSL.listaParticiones))
-            return errores_particion_MultinomialNB
+        #    self.matriz_confusion = m_conf_particion_MultinomialNB/(len(particionadoSL.listaParticiones))
+        #    return errores_particion_MultinomialNB
 
-        else:
-            # Si se ha obtenido menos error con GaussianNB se devuelve el
-            # error de GaussianNB y se pone a False el flag Multinomial_flag
-            clasificadorSL.Multinomial_flag = False
+        #else:
+        #    # Si se ha obtenido menos error con GaussianNB se devuelve el
+        #    # error de GaussianNB y se pone a False el flag Multinomial_flag
+        #    clasificadorSL.Multinomial_flag = False
 
-            self.matriz_confusion = m_conf_particion_GaussianNB/(len(particionadoSL.listaParticiones))
-            return errores_particion_GaussianNB
+        self.matriz_confusion = m_conf_particion_GaussianNB/(len(particionadoSL.listaParticiones))
+        return errores_particion_GaussianNB
 
 ########################################################################################################################
 

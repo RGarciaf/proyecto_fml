@@ -64,10 +64,10 @@ clasificadorSL_NB = ClasificadorSL.ClasificadorNB_SL()
 errores_particion = clasificadorSL_NB.validacion(val_cruzada, dataset, clasificadorSL_NB, seed=seed)
 aciertos_particion = [(1 - elem) for elem in errores_particion]
 
-if clasificadorSL_NB.Multinomial_flag == True:
-    print("MultinomialNB")
-else:
-    print("GaussianNB")
+#if clasificadorSL_NB.Multinomial_flag == True:
+#    print("MultinomialNB")
+#else:
+print("GaussianNB")
 #print("Errores particion: " + str(errores_particion))
 #print("Media: " + str(statistics.mean(errores_particion)))
 #print("Desv tipica: " + str(statistics.stdev(errores_particion)))
@@ -78,7 +78,7 @@ print("Desv tipica: " + str(statistics.stdev(aciertos_particion)))
 print("matriz confusion:\n" + str(clasificadorSL_NB.matriz_confusion))
 print()
 
-
+'''
 # Prueba clasificador KNN
 clasificadorSL_KNN = ClasificadorSL.ClasificadorKNN_SL("distance", 3)
 
@@ -148,3 +148,4 @@ print("Aciertos particion: " + str(aciertos_particion))
 print("Media: " + str(statistics.mean(aciertos_particion)))
 print("Desv tipica: " + str(statistics.stdev(aciertos_particion)))
 print("matriz confusion:\n" + str(clasificadorSL_RandomForest.matriz_confusion))
+'''
