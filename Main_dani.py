@@ -124,16 +124,23 @@ dataset = Dataset(seed=1)
 imagen = mpimg.imread('out/l00000_A.png', True)
 imagenBN = dataset.todoBlancoNegro(imagen)
 
-l_cuadraditros = dataset.crearCuadraditos(0, imagenBN.shape[1], 0, imagenBN.shape[0], n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
-cuadraditos_random = dataset.cuadraditosRandom(imagenBN, 0, l_cuadraditros, porcentajeAgrupacion=0.001, solo_blanco_negro=True, random=False)
+#l_cuadraditros = dataset.crearCuadraditos(0, imagenBN.shape[1], 0, imagenBN.shape[0], n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
+#cuadraditos_random = dataset.cuadraditosRandom(imagenBN, 0, l_cuadraditros, porcentajeAgrupacion=0.001, solo_blanco_negro=True, random=False)
 
+letra = np.array([1,2])
+
+dataset.mostrarImagen(np.reshape(np.array(dataset.cuadraditos(imagen, 0, tamCuadrado=12, solo_blanco_negro=True)[:-1], dtype=np.int), (17, 12)))
+letra[1] = np.reshape(np.array(dataset.cuadraditos(imagen, 0, tamCuadrado=12, solo_blanco_negro=True)[:-1], dtype=np.int), (12, 17))
+
+dataset.mostrarImagenes(letra, columnas=2)
+'''
+'''
 i_1 = 0
-i_2 = imagenBN.shape[1]/n_pixeles_ancho
-tam_cuadraditos_random = len(cuadraditos_random)
-while i_2 < tam_cuadraditos_random:
-    print (cuadraditos_random[round(i_1):round(i_2)])
+i_2 = 12
+while i_2 < 12*16:
+    print (letra2[round(i_1):round(i_2)],letra[round(i_1):round(i_2)])
     i_1 = i_2
-    i_2 += imagenBN.shape[1]/n_pixeles_ancho
+    i_2 += 12
 '''
 
 ####################################################################################################################
@@ -240,72 +247,63 @@ for nombre_imagen in nombres_imagenes:
 
 
 
-tipo_atributos=["random", "patrones"]
-tamano=10
-n_pixeles_ancho=[[1, 10, 20],[None]]
-n_pixeles_alto=[[None, None, None],[None]]
-num_atributos_n_pixeles = len(n_pixeles_ancho[0])
-porcentajeAgrupaciones=[[[0.1, 0.2, 0.3], [0.1, 0.2, 0.3], [0.1, 0.2, 0.3]], [[None]]]
-hacer_recortes=[False, True]
-solo_blanco_negro=[False, True]
-random=True
+tipo_atributos=["cuadraditos", "filas", "columnas"]
+tamano=33
+random=[False, True]
 
 
 
 # Val cruzada
 val_cruzada = EstrategiaParticionadoSL.ValidacionCruzadaSL(numeroParticiones=5)
 
-with open("Datos_random_patrones/columnas_random.txt", 'w') as fichero:
+with open("Datos_random_patrones/prueba.txt", 'w') as fichero:
 
+    '''
     for i_tipo, tipo_atributo in enumerate(tipo_atributos):
         for i_pixeles in range(num_atributos_n_pixeles):
             for porcentajeAgrupacion in porcentajeAgrupaciones[i_tipo][i_pixeles]:
                 for hacer_recorte in hacer_recortes:
-                    for soloBN in solo_blanco_negro:
-                        fichero.write("tipo_atributo\t\t\t" + str(tipo_atributo) + "\n")
-                        fichero.write("n_pixeles_ancho\t" + str(n_pixeles_ancho[i_tipo][i_pixeles]) + "\n")
-                        fichero.write("n_pixeles_alto\t" + str(n_pixeles_alto[i_tipo][i_pixeles]) + "\n")
-                        fichero.write("porcentajeAgrupacion\t" + str(porcentajeAgrupacion) + "\n")
-                        fichero.write("hacer_recorte\t\t\t" + str(hacer_recorte) + "\n")
-                        fichero.write("soloBN\t\t\t\t\t" + str(soloBN) + "\n\n")
+    '''
+    for tipo_atributo in tipo_atributos:
+        for _random in random:
+            fichero.write("tipo_atributo\n" + str(tipo_atributo))
+            fichero.write("tamano\n" + str(tamano))
+            fichero.write("_random\n" + str(_random))
 
 
-                        dataset = Dataset(seed=seed)
-                        dataset.procesarDatos(celdas)
+            dataset = Dataset(seed=seed)
+            dataset.procesarDatos(celdas)
 
-                        dataset.procesarCuadraditos(tipo_atributo, tamano=tamano,
-                                                n_pixeles_ancho=n_pixeles_ancho[i_tipo][i_pixeles], n_pixeles_alto=n_pixeles_alto[i_tipo][i_pixeles],
-                                                porcentajeAgrupacion=porcentajeAgrupacion, solo_blanco_negro=soloBN,
-                                                random=random, hacer_recorte=hacer_recorte)
+            dataset.procesarCuadraditos(tipo_atributo, tamano=tamano, random=_random)
 
-                        # Clasificadores
-                        clasificadorSL_KNN_uniform = ClasificadorSL.ClasificadorKNN_SL()
-                        clasificadorSL_KNN_distance = ClasificadorSL.ClasificadorKNN_SL("distance")
+            # Clasificadores
+            clasificadorSL_KNN_uniform = ClasificadorSL.ClasificadorKNN_SL()
+            clasificadorSL_KNN_distance = ClasificadorSL.ClasificadorKNN_SL("distance")
 
-                        clasificadorSL_NB = ClasificadorSL.ClasificadorNB_SL()
-                        clasificadorSL_RegLog = ClasificadorSL.ClasificadorRegLog_SL(num_epocas=10)
-                        clasificadorSL_ArbolDecision = ClasificadorSL.ClasificadorArbolDecision_SL()
-                        clasificadorSL_RandomForest = ClasificadorSL.ClasificadorRandomForest_SL()
+            clasificadorSL_NB = ClasificadorSL.ClasificadorNB_SL()
+            clasificadorSL_RegLog = ClasificadorSL.ClasificadorRegLog_SL(num_epocas=10)
+            clasificadorSL_ArbolDecision = ClasificadorSL.ClasificadorArbolDecision_SL()
+            clasificadorSL_RandomForest = ClasificadorSL.ClasificadorRandomForest_SL()
 
-                        # Cuadraditos
-                        errores_particion_NB = clasificadorSL_NB.validacion(val_cruzada, dataset, clasificadorSL_NB, seed=seed)
-                        errores_particion_KNN = clasificadorSL_KNN_uniform.validacion(val_cruzada, dataset, clasificadorSL_KNN_uniform, seed=seed)
-                        errores_particion_KNN_2 = clasificadorSL_KNN_distance.validacion(val_cruzada, dataset, clasificadorSL_KNN_distance, seed=seed)
-                        errores_particion_RL = clasificadorSL_RegLog.validacion(val_cruzada, dataset, clasificadorSL_RegLog, seed=seed)
-                        errores_particion_Tree = clasificadorSL_ArbolDecision.validacion(val_cruzada, dataset, clasificadorSL_ArbolDecision, seed=seed)
-                        errores_particion_RF = clasificadorSL_RandomForest.validacion(val_cruzada, dataset, clasificadorSL_RandomForest, seed=seed)
+            # Cuadraditos
+            errores_particion_NB = clasificadorSL_NB.validacion(val_cruzada, dataset, clasificadorSL_NB, seed=seed)
+            errores_particion_KNN = clasificadorSL_KNN_uniform.validacion(val_cruzada, dataset, clasificadorSL_KNN_uniform, seed=seed)
+            errores_particion_KNN_2 = clasificadorSL_KNN_distance.validacion(val_cruzada, dataset, clasificadorSL_KNN_distance, seed=seed)
+            errores_particion_RL = clasificadorSL_RegLog.validacion(val_cruzada, dataset, clasificadorSL_RegLog, seed=seed)
+            errores_particion_Tree = clasificadorSL_ArbolDecision.validacion(val_cruzada, dataset, clasificadorSL_ArbolDecision, seed=seed)
+            errores_particion_RF = clasificadorSL_RandomForest.validacion(val_cruzada, dataset, clasificadorSL_RandomForest, seed=seed)
 
 
-                        fichero.write("GaussianNB\t\t\tKNN_uniform\t\t\tKNN_distance\t\tRegresionLog\t\tTreeDecision\t\tRandomForest\t\t\n" +
-                                      str(round(statistics.mean(errores_particion_NB), 4)) + "+-" + str(round(statistics.stdev(errores_particion_NB), 4)) + "\t\t" +
-                                      str(round(statistics.mean(errores_particion_KNN), 4)) + "+-" + str(round(statistics.stdev(errores_particion_KNN), 4)) + "\t\t" +
-                                      str(round(statistics.mean(errores_particion_KNN_2), 4)) + "+-" + str(round(statistics.stdev(errores_particion_KNN_2), 4)) + "\t\t" +
-                                      str(round(statistics.mean(errores_particion_RL), 4)) + "+-" + str(round(statistics.stdev(errores_particion_RL), 4)) + "\t\t" +
-                                      str(round(statistics.mean(errores_particion_Tree), 4)) + "+-" + str(round(statistics.stdev(errores_particion_Tree), 4)) + "\t\t" +
-                                      str(round(statistics.mean(errores_particion_RF), 4)) + "+-" + str(round(statistics.stdev(errores_particion_RF), 4))
-                                          + "\n-----------------------------------------------------------------------------------------------------------------------\n\n")
+            fichero.write("GaussianNB\t\t\tKNN_uniform\t\t\tKNN_distance\t\tRegresionLog\t\tTreeDecision\t\tRandomForest\t\t\n" +
+                          str(round(statistics.mean(errores_particion_NB), 4)) + "+-" + str(round(statistics.stdev(errores_particion_NB), 4)) + "\t\t" +
+                          str(round(statistics.mean(errores_particion_KNN), 4)) + "+-" + str(round(statistics.stdev(errores_particion_KNN), 4)) + "\t\t" +
+                          str(round(statistics.mean(errores_particion_KNN_2), 4)) + "+-" + str(round(statistics.stdev(errores_particion_KNN_2), 4)) + "\t\t" +
+                          str(round(statistics.mean(errores_particion_RL), 4)) + "+-" + str(round(statistics.stdev(errores_particion_RL), 4)) + "\t\t" +
+                          str(round(statistics.mean(errores_particion_Tree), 4)) + "+-" + str(round(statistics.stdev(errores_particion_Tree), 4)) + "\t\t" +
+                          str(round(statistics.mean(errores_particion_RF), 4)) + "+-" + str(round(statistics.stdev(errores_particion_RF), 4))
+                              + "\n-----------------------------------------------------------------------------------------------------------------------\n\n")
 
-                #raise ValueError("parar")
+                    #raise ValueError("parar")
 
 fichero.close()
 

@@ -168,11 +168,10 @@ class Dataset():
         return
 
     def procesarCuadraditos(self, tipo_atributo="cuadraditos", tamano=1,
-                            n_pixeles_ancho=10, n_pixeles_alto=10,
-                            porcentajeAgrupacion=0.01, solo_blanco_negro=False, random=True, hacer_recorte=True):
+                            porcentajeAgrupacion=0.01, solo_blanco_negro=False, random=False, hacer_recorte=True):
         # Comprueba el tipo de atributo (en funcion del mismo creara un dataset
         # de cuadraditos, filas o columnas)
-        if tipo_atributo == "cuadraditos":
+        if tipo_atributo == "cuadraditos" and not random:
 
             # Convierte el array 1D devuelto por cuadraditos (usando la primera letra) en una fila
             # de un array 2D, de la que se extraen sus dimensiones
@@ -205,7 +204,7 @@ class Dataset():
                 self.datos = np.append(self.datos, dato, axis=0)
                 #self.datos = np.append((self.datos, self.cuadraditos(letra.array_pixels, letra.clase, tamano)))
 
-        elif tipo_atributo == "filas":
+        elif tipo_atributo == "filas" and not random:
 
             # Convierte el array 1D devuelto por cuadraditosFilas (usando la primera letra) en una fila
             # de un array 2D, de la que se extraen sus dimensiones
@@ -232,7 +231,7 @@ class Dataset():
                 self.datos = np.append(self.datos, dato, axis=0)
                 # self.datos = np.append(self.datos, self.cuadraditosFilas(letra.array_pixels, letra.clase, tamano))
 
-        elif tipo_atributo == "columnas":
+        elif tipo_atributo == "columnas" and not random:
             # Convierte el array 1D devuelto por cuadraditosColumnas (usando la primera letra) en una fila
             # de un array 2D, de la que se extraen sus dimensiones
             primera_letra = self.datos_Bruto[0]
@@ -250,25 +249,55 @@ class Dataset():
 
             for letra in self.datos_Bruto[1:]:  # Resto de letras
                 if hacer_recorte:
-                    letra.array_pixels = self.recortar(letra.array_pixels, redimensionar=True, solo_blanco_negro=solo_blanco_negro)
+                    letra.array_pixels = self.recortar(letra.array_pixels, redimensionar=True)
 
-                dato = self.cuadraditosColumnas(letra.array_pixels, letra.clase, tamano)
+                dato = self.cuadraditosColumnas(letra.array_pixels, letra.clase, tamano, solo_blanco_negro=solo_blanco_negro)
                 dato = dato.reshape(1, tam_fila_2d)
 
                 self.datos = np.append(self.datos, dato, axis=0)
                 #self.datos = np.append(self.datos, self.cuadraditosColumnas(letra.array_pixels, letra.clase, tamano))
+        
+        elif tipo_atributo == "patrones":
+            
+            primera_letra = self.datos_Bruto[0]
 
-        elif tipo_atributo == "random":
+            if hacer_recorte:
+                primera_letra.array_pixels = self.recortar(primera_letra.array_pixels, porcentaje_umbral_recorte=[0.1, 0.05, 0.05, 0.15], redimensionar=True)
+            if solo_blanco_negro:
+                primera_letra.array_pixels = self.todoBlancoNegro(primera_letra.array_pixels)
+
+            self.datos = np.array([self.patrones(primera_letra.array_pixels, primera_letra.clase, solo_blanco_negro=solo_blanco_negro)])
+
+            for letra in self.datos_Bruto[1:]:  # Resto de letras
+                if hacer_recorte:
+                    letra.array_pixels = self.recortar(letra.array_pixels, redimensionar=True)
+
+                if solo_blanco_negro:
+                    letra.array_pixels = self.todoBlancoNegro(letra.array_pixels)
+
+                l_cuadraditros = self.crearCuadraditos(0, letra.array_pixels.shape[1], 0, letra.array_pixels.shape[0],
+                                                          n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
+                dato = self.patrones(letra.array_pixels, letra.clase, solo_blanco_negro=False)
+                self.datos = np.concatenate((self.datos, np.array([dato])))
+
+        elif random:
+            
+            if tipo_atributo == "cuadraditos":
+                n_pixeles_alto = tamano
+                n_pixeles_ancho = tamano
+            elif tipo_atributo == "filas":
+                n_pixeles_alto = tamano
+                n_pixeles_ancho = None
+            elif tipo_atributo == "columnas":
+                n_pixeles_alto = None
+                n_pixeles_ancho = tamano
+            else:
+                raise ValueError('Tipo de "tipo_atributo" ' + str(tipo_atributo) + ' incorrecto.')
             
             primera_letra = self.datos_Bruto[0]
 
             if hacer_recorte:
                 primera_letra.array_pixels = self.recortar(primera_letra.array_pixels, redimensionar=True)
-            
-                #self.mostrarImagen(primera_letra.array_pixels)
-
-            #if solo_blanco_negro:
-            #    primera_letra.array_pixels = self.todoBlancoNegro(primera_letra.array_pixels)
 
             l_cuadraditros = self.crearCuadraditos(0, primera_letra.array_pixels.shape[1], 0, primera_letra.array_pixels.shape[0],
                                                       n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
@@ -298,29 +327,6 @@ class Dataset():
                                                  porcentajeAgrupacion=porcentajeAgrupacion, solo_blanco_negro=solo_blanco_negro, random=random)
                 
 
-                self.datos = np.concatenate((self.datos, np.array([dato])))
-        
-        elif tipo_atributo == "patrones":
-            
-            primera_letra = self.datos_Bruto[0]
-
-            if hacer_recorte:
-                primera_letra.array_pixels = self.recortar(primera_letra.array_pixels, porcentaje_umbral_recorte=[0.1, 0.05, 0.05, 0.15], redimensionar=True)
-            if solo_blanco_negro:
-                primera_letra.array_pixels = self.todoBlancoNegro(primera_letra.array_pixels)
-
-            self.datos = np.array([self.patrones(primera_letra.array_pixels, primera_letra.clase, solo_blanco_negro=solo_blanco_negro)])
-
-            for letra in self.datos_Bruto[1:]:  # Resto de letras
-                if hacer_recorte:
-                    letra.array_pixels = self.recortar(letra.array_pixels, redimensionar=True)
-
-                if solo_blanco_negro:
-                    letra.array_pixels = self.todoBlancoNegro(letra.array_pixels)
-
-                l_cuadraditros = self.crearCuadraditos(0, letra.array_pixels.shape[1], 0, letra.array_pixels.shape[0],
-                                                          n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
-                dato = self.patrones(letra.array_pixels, letra.clase, solo_blanco_negro=False)
                 self.datos = np.concatenate((self.datos, np.array([dato])))
 
         else:
