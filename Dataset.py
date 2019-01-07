@@ -115,7 +115,7 @@ class Dataset():
 
     def redimensionarImagen(self, imagen, tam_h_actual, tam_v_actual):
         '''
-        Dada una imagen, estira o encoge para que tenga las proporciones de "self.tam_img"
+        Dada una imagen, la estira o encoge para que tenga las proporciones de "self.tam_img"
         '''
 
         tam_h_actual -= 1
@@ -128,7 +128,13 @@ class Dataset():
         for i in range(tam_v_final):
             imagen_redimensionada.append([])
             for j in range(tam_h_final):
-                imagen_redimensionada[i].append(imagen[(round(i/tam_v_final*tam_v_actual))][(round(j/tam_h_final*tam_h_actual))])
+                try:
+                    imagen_redimensionada[i].append(imagen[(round(i/tam_v_final*tam_v_actual))][(round(j/tam_h_final*tam_h_actual))])
+                except IndexError:
+                    print ("imagen", imagen)
+                    print ("round(i/tam_v_final*tam_v_actual)", round(i/tam_v_final*tam_v_actual))
+                    print ("round(j/tam_h_final*tam_h_actual)", round(j/tam_h_final*tam_h_actual))
+                    raise ValueError ("holasd")
 
         
         return np.array(imagen_redimensionada, dtype=np.int)
@@ -182,7 +188,7 @@ class Dataset():
             self.datos = np.append(self.datos, primer_dato, axis=0)  # Primera letra
 
             '''
-            self.mostrarImagen(primera_letra.array_pixels)
+            #self.mostrarImagen(primera_letra.array_pixels)
             print ("len_self.datos_Cuadraditos", len(self.datos[0]))            
             with open("fichCuadraditos.data", 'w') as fichero:
                 fichero.write(str(self.datos))
@@ -259,6 +265,8 @@ class Dataset():
             if hacer_recorte:
                 primera_letra.array_pixels = self.recortar(primera_letra.array_pixels, redimensionar=True)
             
+                #self.mostrarImagen(primera_letra.array_pixels)
+
             #if solo_blanco_negro:
             #    primera_letra.array_pixels = self.todoBlancoNegro(primera_letra.array_pixels)
 
@@ -268,7 +276,7 @@ class Dataset():
                                              porcentajeAgrupacion=porcentajeAgrupacion, solo_blanco_negro=solo_blanco_negro, random=random)])
             
             '''
-            self.mostrarImagen(primera_letra.array_pixels)
+            #self.mostrarImagen(primera_letra.array_pixels)
             print ("len_self.datos_Random", len(self.datos[0]))
             with open("fichRandom.data", 'w') as fichero:
                 fichero.write(str(self.datos))
@@ -277,8 +285,10 @@ class Dataset():
 
             for letra in self.datos_Bruto[1:]:  # Resto de letras
                 if hacer_recorte:
-                    letra.array_pixels = self.recortar(letra.array_pixels, redimensionar=True)
-
+                    try:
+                        letra.array_pixels = self.recortar(letra.array_pixels, redimensionar=True)
+                    except ValueError:
+                        raise ValueError ("letra", letra, "len_self.datos_Bruto[1:]", len(self.datos_Bruto[1:]))
                 #if solo_blanco_negro:
                 #    letra.array_pixels = self.todoBlancoNegro(letra.array_pixels)
 
@@ -424,11 +434,11 @@ class Dataset():
         # una permutacion de los indices de los cuadraditos a utilizar
         if self.permutacion is None:
             if random:
-                self.permutacion = np.random.permutation(np.arange(num_cuadraditos+1))
+                self.permutacion = np.random.permutation(np.arange(num_cuadraditos))
             else:
-                self.permutacion = np.arange(num_cuadraditos+1)#np.random.permutation(np.arange(num_cuadraditos))
+                self.permutacion = np.arange(num_cuadraditos)#np.random.permutation(np.arange(num_cuadraditos))
 
-        elif len(self.permutacion) != num_cuadraditos + 1:
+        elif len(self.permutacion) != num_cuadraditos:
             raise ValueError ("Algo ha ido mal el tamanyo de la permutacion " + str(len(self.permutacion)) + " no coincide con el numero de cuadraditos " + str(num_cuadraditos))
 
         # Se ajusta el "porcentajeAgrupacion" para evitar la division por cero
@@ -446,7 +456,12 @@ class Dataset():
             # Se obtiene la sublista de cuadraditos que conformaran un atributo
             l_cuadraditros_atributo = []
             for i in self.permutacion[round(num_cuadraditos*i_inferior):round(num_cuadraditos*i_superior)]:
-                l_cuadraditros_atributo.append(l_cuadraditros[i])
+                
+                try:
+                    l_cuadraditros_atributo.append(l_cuadraditros[i])
+                except IndexError:
+                    print (l_cuadraditros, sorted(self.permutacion), "len(l_cuadraditros)", len(l_cuadraditros), "i", i)
+                    raise ValueError ("holo")
 
             '''
             if solo_blanco_negro:

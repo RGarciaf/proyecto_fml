@@ -29,11 +29,11 @@ dataset.procesarCuadraditos("cuadraditos", 10)
 '''
 
 
-tipo_atributo="cuadraditos"
+tipo_atributo="random"
 tamano=9
 n_pixeles_ancho=9
 n_pixeles_alto=n_pixeles_ancho
-porcentajeAgrupacion=0.1
+porcentajeAgrupacion=0
 solo_blanco_negro=True
 random=False
 hacer_recorte=False

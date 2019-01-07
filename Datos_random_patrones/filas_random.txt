@@ -1,0 +1,445 @@
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	1
+porcentajeAgrupacion	0.1
+hacer_recorte			False
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.7902+-0.0083		0.5136+-0.0481		0.4985+-0.0339		0.878+-0.0493		0.6462+-0.0347		0.4894+-0.0388
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	1
+porcentajeAgrupacion	0.1
+hacer_recorte			False
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.8235+-0.0095		0.8265+-0.0231		0.825+-0.0267		0.8697+-0.0158		0.8386+-0.0151		0.8205+-0.0166
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	1
+porcentajeAgrupacion	0.1
+hacer_recorte			True
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.6076+-0.0294		0.3386+-0.0299		0.3356+-0.0274		0.6652+-0.0613		0.4553+-0.0248		0.3+-0.0416
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	1
+porcentajeAgrupacion	0.1
+hacer_recorte			True
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.9144+-0.0138		0.8727+-0.0231		0.8894+-0.0223		0.9061+-0.0174		0.8947+-0.0168		0.9045+-0.0105
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	1
+porcentajeAgrupacion	0.2
+hacer_recorte			False
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.797+-0.0198		0.6833+-0.0173		0.6629+-0.0395		0.8795+-0.0479		0.7106+-0.0231		0.6288+-0.0244
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	1
+porcentajeAgrupacion	0.2
+hacer_recorte			False
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.853+-0.014		0.8629+-0.0203		0.897+-0.013		0.8742+-0.019		0.8432+-0.0258		0.8348+-0.0091
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	1
+porcentajeAgrupacion	0.2
+hacer_recorte			True
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.6727+-0.0234		0.4955+-0.0217		0.4902+-0.0443		0.7833+-0.0527		0.55+-0.0407		0.4318+-0.0241
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	1
+porcentajeAgrupacion	0.2
+hacer_recorte			True
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.9167+-0.0139		0.8917+-0.0141		0.8992+-0.0181		0.9061+-0.0174		0.9212+-0.0098		0.925+-0.0098
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	1
+porcentajeAgrupacion	0.3
+hacer_recorte			False
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.8144+-0.0165		0.7636+-0.0187		0.7652+-0.0097		0.9015+-0.0097		0.8015+-0.0207		0.7576+-0.018
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	1
+porcentajeAgrupacion	0.3
+hacer_recorte			False
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.8508+-0.0138		0.8788+-0.036		0.8788+-0.0182		0.8871+-0.0243		0.8568+-0.0225		0.847+-0.0148
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	1
+porcentajeAgrupacion	0.3
+hacer_recorte			True
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.7008+-0.0253		0.6326+-0.0438		0.6386+-0.0284		0.8068+-0.0299		0.6538+-0.0231		0.5689+-0.0386
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	1
+porcentajeAgrupacion	0.3
+hacer_recorte			True
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.9174+-0.0105		0.8932+-0.0164		0.9008+-0.0124		0.9045+-0.0062		0.925+-0.0068		0.928+-0.0089
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	10
+porcentajeAgrupacion	0.1
+hacer_recorte			False
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.6515+-0.0235		0.4705+-0.0288		0.4689+-0.0252		0.8462+-0.0654		0.475+-0.0183		0.303+-0.0165
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	10
+porcentajeAgrupacion	0.1
+hacer_recorte			False
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.8636+-0.0235		0.772+-0.0307		0.7545+-0.0112		0.853+-0.0164		0.7008+-0.0264		0.6894+-0.012
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random   ####################################### TOP 2
+n_pixeles_ancho	None
+n_pixeles_alto	10
+porcentajeAgrupacion	0.1
+hacer_recorte			True
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.3008+-0.023		0.2273+-0.0253		0.2197+-0.0097		0.4939+-0.0675		0.3144+-0.0258		0.1909+-0.0359
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	10
+porcentajeAgrupacion	0.1
+hacer_recorte			True
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.6909+-0.0493		0.678+-0.0515		0.7136+-0.0198		0.8417+-0.0845		0.6235+-0.0194		0.6136+-0.0265
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	10
+porcentajeAgrupacion	0.2
+hacer_recorte			False
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.7394+-0.0164		0.6258+-0.0303		0.6144+-0.0199		0.8659+-0.0383		0.7008+-0.0158		0.5773+-0.0284
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	10
+porcentajeAgrupacion	0.2
+hacer_recorte			False
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.8667+-0.0259		0.8614+-0.0398		0.8553+-0.0649		0.8765+-0.0185		0.7947+-0.0105		0.8098+-0.0135
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	10
+porcentajeAgrupacion	0.2
+hacer_recorte			True
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.4924+-0.0344		0.3902+-0.032		0.3788+-0.0331		0.5818+-0.0279		0.4636+-0.0237		0.3515+-0.0236
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	10
+porcentajeAgrupacion	0.2
+hacer_recorte			True
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.8508+-0.0133		0.8144+-0.0241		0.8197+-0.0148		0.9136+-0.0186		0.8061+-0.0181		0.8083+-0.0183
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	10
+porcentajeAgrupacion	0.3
+hacer_recorte			False
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.8045+-0.0164		0.7924+-0.0268		0.778+-0.0503		0.8727+-0.0344		0.7795+-0.028		0.7652+-0.0204
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	10
+porcentajeAgrupacion	0.3
+hacer_recorte			False
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.8447+-0.0376		0.8386+-0.0322		0.8515+-0.0225		0.9008+-0.0205		0.8152+-0.0283		0.8091+-0.0102
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	10
+porcentajeAgrupacion	0.3
+hacer_recorte			True
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.5879+-0.013		0.6008+-0.0225		0.5864+-0.042		0.7371+-0.0391		0.5788+-0.0318		0.5114+-0.0304
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	10
+porcentajeAgrupacion	0.3
+hacer_recorte			True
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.8947+-0.0138		0.8947+-0.0203		0.8886+-0.0063		0.922+-0.0069		0.8894+-0.0233		0.8795+-0.0105
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random  ####################################### TOP 1
+n_pixeles_ancho	None
+n_pixeles_alto	20
+porcentajeAgrupacion	0.1
+hacer_recorte			False
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.4+-0.0246		0.3455+-0.0312		0.3455+-0.0174		0.7288+-0.0978		0.35+-0.0183		0.1674+-0.0118
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	20
+porcentajeAgrupacion	0.1
+hacer_recorte			False
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.7061+-0.0191		0.6538+-0.0577		0.6848+-0.0086		0.8697+-0.0545		0.5568+-0.0292		0.5462+-0.0253
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	20
+porcentajeAgrupacion	0.1
+hacer_recorte			True
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.3856+-0.0301		0.3356+-0.0391		0.3364+-0.0174		0.578+-0.0444		0.4015+-0.0171		0.2932+-0.0385
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	20
+porcentajeAgrupacion	0.1
+hacer_recorte			True
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.7841+-0.0154		0.7576+-0.0093		0.7788+-0.0385		0.8803+-0.069		0.7295+-0.0327		0.728+-0.021
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	20
+porcentajeAgrupacion	0.2
+hacer_recorte			False
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.672+-0.0169		0.5811+-0.0284		0.5826+-0.0168		0.803+-0.0513		0.6333+-0.0286		0.4985+-0.0222
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	20
+porcentajeAgrupacion	0.2
+hacer_recorte			False
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.8205+-0.0363		0.8227+-0.0281		0.8333+-0.0134		0.9144+-0.0171		0.7485+-0.0215		0.7477+-0.0274
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	20
+porcentajeAgrupacion	0.2
+hacer_recorte			True
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.3856+-0.0301		0.3356+-0.0391		0.3364+-0.0174		0.578+-0.0444		0.4015+-0.0171		0.2932+-0.0385
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	20
+porcentajeAgrupacion	0.2
+hacer_recorte			True
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.7841+-0.0154		0.7576+-0.0093		0.7788+-0.0385		0.8803+-0.069		0.7295+-0.0327		0.728+-0.021
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	20
+porcentajeAgrupacion	0.3
+hacer_recorte			False
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.7508+-0.0112		0.7386+-0.0199		0.7409+-0.0148		0.8848+-0.0196		0.7629+-0.028		0.6947+-0.0261
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	20
+porcentajeAgrupacion	0.3
+hacer_recorte			False
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.8182+-0.0128		0.8689+-0.0158		0.8629+-0.0098		0.922+-0.0069		0.8114+-0.0272		0.8091+-0.0288
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	20
+porcentajeAgrupacion	0.3
+hacer_recorte			True
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.5644+-0.0097		0.6121+-0.0116		0.6136+-0.0142		0.7667+-0.0301		0.6311+-0.0162		0.5545+-0.0245
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			random
+n_pixeles_ancho	None
+n_pixeles_alto	20
+porcentajeAgrupacion	0.3
+hacer_recorte			True
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.8311+-0.0179		0.8477+-0.0314		0.8371+-0.0244		0.9068+-0.0333		0.8386+-0.013		0.8386+-0.0122
+-----------------------------------------------------------------------------------------------------------------------
+
+
+########################################################################################################################
+#### Desde aqui para abajo esta repetido en todos los ficheros de resultados _random
+########################################################################################################################
+
+tipo_atributo			patrones
+n_pixeles_ancho	None
+n_pixeles_alto	None
+porcentajeAgrupacion	None
+hacer_recorte			False
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.1977+-0.0206		0.1455+-0.0321		0.1606+-0.0079		0.4553+-0.0617		0.203+-0.0329		0.0652+-0.0198
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			patrones
+n_pixeles_ancho	None
+n_pixeles_alto	None
+porcentajeAgrupacion	None
+hacer_recorte			False
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.5917+-0.0124		0.1606+-0.0282		0.1765+-0.0179		0.4242+-0.0326		0.3886+-0.0288		0.1826+-0.0178
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			patrones
+n_pixeles_ancho	None
+n_pixeles_alto	None
+porcentajeAgrupacion	None
+hacer_recorte			True
+soloBN					False
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.1189+-0.0119		0.0462+-0.0056		0.0538+-0.0094		0.1545+-0.0597		0.128+-0.0206		0.0485+-0.0118
+-----------------------------------------------------------------------------------------------------------------------
+
+tipo_atributo			patrones
+n_pixeles_ancho	None
+n_pixeles_alto	None
+porcentajeAgrupacion	None
+hacer_recorte			True
+soloBN					True
+
+GaussianNB			KNN_uniform			KNN_distance		RegresionLog		TreeDecision		RandomForest		
+0.122+-0.0182		0.0576+-0.0112		0.0576+-0.0041		0.1212+-0.0421		0.1348+-0.0308		0.0591+-0.0155
+-----------------------------------------------------------------------------------------------------------------------
+
