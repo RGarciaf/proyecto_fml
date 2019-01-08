@@ -247,16 +247,12 @@ for nombre_imagen in nombres_imagenes:
 
 
 
-tipo_atributos=["cuadraditos", "filas", "columnas"]
-tamano=33
-random=[False, True]
-
 
 
 # Val cruzada
 val_cruzada = EstrategiaParticionadoSL.ValidacionCruzadaSL(numeroParticiones=5)
 
-with open("Datos_random_patrones/prueba.txt", 'w') as fichero:
+with open("Datos_random_patrones/patrones.txt", 'w') as fichero:
 
     '''
     for i_tipo, tipo_atributo in enumerate(tipo_atributos):
@@ -264,17 +260,17 @@ with open("Datos_random_patrones/prueba.txt", 'w') as fichero:
             for porcentajeAgrupacion in porcentajeAgrupaciones[i_tipo][i_pixeles]:
                 for hacer_recorte in hacer_recortes:
     '''
-    for tipo_atributo in tipo_atributos:
-        for _random in random:
-            fichero.write("tipo_atributo\n" + str(tipo_atributo))
-            fichero.write("tamano\n" + str(tamano))
-            fichero.write("_random\n" + str(_random))
+    for solo_BN in [True, False]:
+        for hacer_recorte in [True, False]:
+            fichero.write("tipo_atributo\t patrones\n")
+            fichero.write("solo_blanco_negro\t " + str(solo_BN) +"\n")
+            fichero.write("hacer_recorte\t " + str(hacer_recorte) +"\n")
 
 
             dataset = Dataset(seed=seed)
             dataset.procesarDatos(celdas)
 
-            dataset.procesarCuadraditos(tipo_atributo, tamano=tamano, random=_random)
+            dataset.procesarCuadraditos(tipo_atributo="patrones", solo_blanco_negro=solo_BN, hacer_recorte=hacer_recorte)
 
             # Clasificadores
             clasificadorSL_KNN_uniform = ClasificadorSL.ClasificadorKNN_SL()

@@ -128,13 +128,7 @@ class Dataset():
         for i in range(tam_v_final):
             imagen_redimensionada.append([])
             for j in range(tam_h_final):
-                try:
-                    imagen_redimensionada[i].append(imagen[(round(i/tam_v_final*tam_v_actual))][(round(j/tam_h_final*tam_h_actual))])
-                except IndexError:
-                    print ("imagen", imagen)
-                    print ("round(i/tam_v_final*tam_v_actual)", round(i/tam_v_final*tam_v_actual))
-                    print ("round(j/tam_h_final*tam_h_actual)", round(j/tam_h_final*tam_h_actual))
-                    raise ValueError ("holasd")
+                imagen_redimensionada[i].append(imagen[(round(i/tam_v_final*tam_v_actual))][(round(j/tam_h_final*tam_h_actual))])
 
         
         return np.array(imagen_redimensionada, dtype=np.int)
@@ -186,14 +180,6 @@ class Dataset():
             self.datos = np.empty((0, tam_fila_2d), dtype=int)
             self.datos = np.append(self.datos, primer_dato, axis=0)  # Primera letra
 
-            '''
-            #self.mostrarImagen(primera_letra.array_pixels)
-            print ("len_self.datos_Cuadraditos", len(self.datos[0]))            
-            with open("fichCuadraditos.data", 'w') as fichero:
-                fichero.write(str(self.datos))
-            fichero.close()
-            '''
-
             for letra in self.datos_Bruto[1:]:  # Resto de letras
                 if hacer_recorte:
                     letra.array_pixels = self.recortar(letra.array_pixels, redimensionar=True)
@@ -219,8 +205,6 @@ class Dataset():
             self.datos = np.empty((0, tam_fila_2d), dtype=int)
             self.datos = np.append(self.datos, primer_dato, axis=0)  # Primera letra
 
-            #print ("len_self.datos_Cuadraditos", len(self.datos[0]))
-
             for letra in self.datos_Bruto[1:]:  # Resto de letras
                 if hacer_recorte:
                     letra.array_pixels = self.recortar(letra.array_pixels, redimensionar=True)
@@ -232,6 +216,7 @@ class Dataset():
                 # self.datos = np.append(self.datos, self.cuadraditosFilas(letra.array_pixels, letra.clase, tamano))
 
         elif tipo_atributo == "columnas" and not random:
+
             # Convierte el array 1D devuelto por cuadraditosColumnas (usando la primera letra) en una fila
             # de un array 2D, de la que se extraen sus dimensiones
             primera_letra = self.datos_Bruto[0]
@@ -245,8 +230,6 @@ class Dataset():
             self.datos = np.empty((0, tam_fila_2d), dtype=int)
             self.datos = np.append(self.datos, primer_dato, axis=0)  # Primera letra
 
-            #print ("len_self.datos_Cuadraditos", len(self.datos[0]))
-
             for letra in self.datos_Bruto[1:]:  # Resto de letras
                 if hacer_recorte:
                     letra.array_pixels = self.recortar(letra.array_pixels, redimensionar=True)
@@ -257,14 +240,12 @@ class Dataset():
                 self.datos = np.append(self.datos, dato, axis=0)
                 #self.datos = np.append(self.datos, self.cuadraditosColumnas(letra.array_pixels, letra.clase, tamano))
         
-        elif tipo_atributo == "patrones":
-            
+        elif tipo_atributo == "patrones":        
+
             primera_letra = self.datos_Bruto[0]
 
             if hacer_recorte:
-                primera_letra.array_pixels = self.recortar(primera_letra.array_pixels, porcentaje_umbral_recorte=[0.1, 0.05, 0.05, 0.15], redimensionar=True)
-            if solo_blanco_negro:
-                primera_letra.array_pixels = self.todoBlancoNegro(primera_letra.array_pixels)
+                primera_letra.array_pixels = self.recortar(primera_letra.array_pixels, porcentaje_umbral_recorte=0.1, redimensionar=True)
 
             self.datos = np.array([self.patrones(primera_letra.array_pixels, primera_letra.clase, solo_blanco_negro=solo_blanco_negro)])
 
@@ -272,10 +253,8 @@ class Dataset():
                 if hacer_recorte:
                     letra.array_pixels = self.recortar(letra.array_pixels, redimensionar=True)
 
-                if solo_blanco_negro:
-                    letra.array_pixels = self.todoBlancoNegro(letra.array_pixels)
-
                 dato = self.patrones(letra.array_pixels, letra.clase, solo_blanco_negro=False)
+
                 self.datos = np.concatenate((self.datos, np.array([dato])))
 
         elif random:
@@ -301,23 +280,10 @@ class Dataset():
                                                       n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
             self.datos = np.array([self.cuadraditosRandom(primera_letra.array_pixels, primera_letra.clase, l_cuadraditros,
                                              porcentajeAgrupacion=porcentajeAgrupacion, solo_blanco_negro=solo_blanco_negro, random=random)])
-            
-            '''
-            #self.mostrarImagen(primera_letra.array_pixels)
-            print ("len_self.datos_Random", len(self.datos[0]))
-            with open("fichRandom.data", 'w') as fichero:
-                fichero.write(str(self.datos))
-            fichero.close()
-            '''
 
             for letra in self.datos_Bruto[1:]:  # Resto de letras
                 if hacer_recorte:
-                    try:
-                        letra.array_pixels = self.recortar(letra.array_pixels, redimensionar=True)
-                    except ValueError:
-                        raise ValueError ("letra", letra, "len_self.datos_Bruto[1:]", len(self.datos_Bruto[1:]))
-                #if solo_blanco_negro:
-                #    letra.array_pixels = self.todoBlancoNegro(letra.array_pixels)
+                    letra.array_pixels = self.recortar(letra.array_pixels, redimensionar=True)
 
                 l_cuadraditros = self.crearCuadraditos(0, letra.array_pixels.shape[1], 0, letra.array_pixels.shape[0],
                                                           n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
@@ -333,17 +299,10 @@ class Dataset():
         return
 
     def cuadraditos(self, letra, clase, tamCuadrado=1, solo_blanco_negro=True):
+
         # Comprueba si los cuadraditos son bloques o pixeles
         if tamCuadrado == 1:
-            '''
-            # Aplana el array letra a 1D
-            dimensiones = letra.shape[0] * letra.shape[1]
-            letra = np.reshape(letra, dimensiones)
-            
-            # Codifica los pixeles de letra a 0s o 1s y annade la clase
-            letra = self.convertirPixeles(letra)
-            letra = np.append(letra, clase)
-            '''
+
             # Aplana el array letra a 1D
             letra = np.array(np.reshape(letra, letra.size))
             
@@ -353,6 +312,7 @@ class Dataset():
             
             letra = np.append(letra, clase)
         else:
+
             # Crea un array 1D con los valores medios de cada bloque
             media = np.array([], dtype='int')
 
@@ -443,7 +403,8 @@ class Dataset():
                 self.permutacion = np.arange(num_cuadraditos)#np.random.permutation(np.arange(num_cuadraditos))
 
         elif len(self.permutacion) != num_cuadraditos:
-            raise ValueError ("Algo ha ido mal el tamanyo de la permutacion " + str(len(self.permutacion)) + " no coincide con el numero de cuadraditos " + str(num_cuadraditos))
+            raise ValueError ("Algo ha ido mal el tamanyo de la permutacion " + str(len(self.permutacion)) +
+                              " no coincide con el numero de cuadraditos " + str(num_cuadraditos))
 
         # Se ajusta el "porcentajeAgrupacion" para evitar la division por cero
         # y para no repetir agrupaciones. Si porcentajeAgrupacion = 0.1
@@ -460,19 +421,7 @@ class Dataset():
             # Se obtiene la sublista de cuadraditos que conformaran un atributo
             l_cuadraditros_atributo = []
             for i in self.permutacion[round(num_cuadraditos*i_inferior):round(num_cuadraditos*i_superior)]:
-                
-                try:
-                    l_cuadraditros_atributo.append(l_cuadraditros[i])
-                except IndexError:
-                    print (l_cuadraditros, sorted(self.permutacion), "len(l_cuadraditros)", len(l_cuadraditros), "i", i)
-                    raise ValueError ("holo")
-
-            '''
-            if solo_blanco_negro:
-                atributos.append(self.votarBlancoNegro(imagen_letra, l_cuadraditros_atributo, votacion))
-            else:
-                atributos.append(self.mediaColores(imagen_letra, l_cuadraditros_atributo))
-            '''
+                l_cuadraditros_atributo.append(l_cuadraditros[i])
 
             atributos.append(self.mediaColores(imagen_letra, l_cuadraditros_atributo))
 
@@ -482,12 +431,8 @@ class Dataset():
             i_superior += porcentajeAgrupacion
             i_superior = 1 if (i_superior < 1 and i_superior+porcentajeAgrupacion > 1) else i_superior
 
-        
-
         if solo_blanco_negro:
             atributos = self.convertirPixeles(atributos)
-
-        
 
         return np.append(atributos, np.array(clase))
     
@@ -504,11 +449,11 @@ class Dataset():
         l_corte_v = [0 for _ in range(8)]
         l_corte_h = [0 for _ in range(8)]
 
-        l_corte_v[1] += l_corte_v[0] + ancho_rotulador
-        l_corte_h[1] += l_corte_h[0] + ancho_rotulador
-
         l_corte_v[7] += imagen.shape[1]
         l_corte_h[7] += imagen.shape[0]
+
+        l_corte_v[1] += l_corte_v[0] + ancho_rotulador
+        l_corte_h[1] += l_corte_h[0] + ancho_rotulador
 
         l_corte_v[6] += l_corte_v[7] - ancho_rotulador
         l_corte_h[6] += l_corte_h[7] - ancho_rotulador
@@ -525,37 +470,16 @@ class Dataset():
         l_corte_v[5] += int((l_corte_v[6] + l_corte_v[4]) / 2)
         l_corte_h[5] += int((l_corte_h[6] + l_corte_h[4]) / 2)
 
-        '''
-        # Codigo para ver los cortes
-        l_cuadraditros = []
-        tam_l_cortes = len(l_corte_h)
-        for i in range(0, tam_l_cortes - 1):
-            for j in range(0, tam_l_cortes - 1):
-                l_cuadraditros.append([(l_corte_v[j], l_corte_v[j+1]), (l_corte_h[i], l_corte_h[i+1])])
-
-
-        imagenes = []
-        for cuadradito in l_cuadraditros:
-            imagen_recorte = imagen[cuadradito[1][0]:cuadradito[1][1], cuadradito[0][0]:cuadradito[0][1]]
-            imagenes.append(imagen_recorte)
-
-        self.mostrarImagenes(imagenes, columnas=7)
-        '''
-
         atributos = []
         tam_l_cortes = len(l_corte_h)
         for i in range(0, tam_l_cortes - 1):
             for j in range(0, tam_l_cortes - 1):
-                
-                if solo_blanco_negro:
-                    dato = self.colorMayoritario(imagen, l_corte_v[j], l_corte_v[j+1], l_corte_h[i], l_corte_h[i+1], resultados=False)
-
-                    dato = 1 if dato == 255 else 0
-                else:
-                    dato = self.mediaColores(imagen, [[(l_corte_v[j], l_corte_v[j+1]), (l_corte_h[i], l_corte_h[i+1])]])
+                dato = self.mediaColores(imagen, [[(l_corte_v[j], l_corte_v[j+1]), (l_corte_h[i], l_corte_h[i+1])]])
                
                 atributos.append(dato)
 
+        if solo_blanco_negro:
+            atributos = self.convertirPixeles(atributos)
 
         atributos.append(clase)
         return np.array(atributos)
@@ -565,24 +489,7 @@ class Dataset():
         Para cada imagen se extrae como atributo la dieferencia del valor rgb de cada pixel 
         con el pixel en la misma posicion de las imagenes a ordenador correspondientes a la clase
         """
-        '''
-        # Codigo para ver como actua diferencia en una imagen especifica num_img
-        num_img = 1059
-        datos = []
-        for foto in self.datos_Bruto[num_img:num_img+1]:
-            for letra in self.primera_Linea:
-                #if letra.clase == foto.clase:
-                resta = np.array(self.todoBlancoNegro(letra.array_pixels)) - self.todoBlancoNegro(np.array(foto.array_pixels))
-                resta = np.append(np.append(resta,self.diferenciaPorcentajeAttr(foto, letra)) ,letra.clase)
-                datos.append(resta.tolist())
-        if arreglo == "+255":
-            self.datos = np.array(datos) + 255
-        elif arreglo == "abs":
-            self.datos = np.absolute(np.array(datos))
-        else:
-            raise ValueError ('Tipo de arreglo erroneo ' + str(arreglo) + ' solo se permite "+255" o "abs".')
-        return self.datos
-        '''
+
         datos = []
         for foto in self.datos_Bruto:
             for letra in self.primera_Linea:
@@ -596,6 +503,7 @@ class Dataset():
             self.datos = np.absolute(np.array(datos))
         else:
             raise ValueError ('Tipo de arreglo erroneo ' + str(arreglo) + ' solo se permite "+255" o "abs".')
+
         return self.datos
 
     def diferenciaPorcentajeAttr(self, foto, letra):
@@ -618,16 +526,14 @@ class Dataset():
             self.datos = np.absolute(np.array(datos))
         else:
             raise ValueError ('Tipo de arreglo erroneo ' + str(arreglo) + ' solo se permite "+255" o "abs".')
+
         return self.datos
-    
-    def negros(self):
-        pass
 
     def votarBlancoNegro(self, imagen, l_cuadraditros_atributo, votacion=None):
         '''
         Se vota si hay mas blancos, 
         '''
-        #print ("l_cuadraditros_atributo", len(l_cuadraditros_atributo))
+
         # Por cada cuadradito "c", se incrementa el contador de votos del color en ese
         # cuadradito. Si se eligio la votacion por tamanyo cada cuadradito tiene tantos
         # votos como numero de pixeles en el cuadradito
