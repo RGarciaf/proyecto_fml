@@ -275,8 +275,6 @@ class Dataset():
                 if solo_blanco_negro:
                     letra.array_pixels = self.todoBlancoNegro(letra.array_pixels)
 
-                l_cuadraditros = self.crearCuadraditos(0, letra.array_pixels.shape[1], 0, letra.array_pixels.shape[0],
-                                                          n_pixeles_ancho=n_pixeles_ancho, n_pixeles_alto=n_pixeles_alto)
                 dato = self.patrones(letra.array_pixels, letra.clase, solo_blanco_negro=False)
                 self.datos = np.concatenate((self.datos, np.array([dato])))
 
